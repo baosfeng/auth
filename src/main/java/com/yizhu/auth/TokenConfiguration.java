@@ -1,19 +1,20 @@
 package com.yizhu.auth;
 
 import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.dao.*;
+import com.yizhu.auth.dao.RedisTokenDaoImpl;
+import com.yizhu.auth.dao.TokenDao;
+import com.yizhu.auth.dao.TokenDaoDefaultImpl;
 import com.yizhu.auth.exception.AuthExceptionHandler;
 import com.yizhu.auth.interceptor.AuthInterceptor;
 import com.yizhu.auth.running.AuthEnvironmentAware;
-import com.yizhu.auth.utils.TokenUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import com.yizhu.auth.utils.SpringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -47,8 +48,8 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public TokenUtils tokenUtils() {
-		return new TokenUtils();
+	public SpringUtils springUtils() {
+		return new SpringUtils();
 	}
 
 	@Bean
@@ -57,6 +58,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	@Order
 	public AuthInterceptor authInterceptor() {
 		return new AuthInterceptor();
 	}

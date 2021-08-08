@@ -1,15 +1,14 @@
 package com.yizhu.auth.interceptor;
 
+import com.yizhu.auth.TokenManager;
 import com.yizhu.auth.config.AuthConfig;
 import com.yizhu.auth.constant.AuthConstant;
 import com.yizhu.auth.dao.TokenDao;
 import com.yizhu.auth.dao.UserInfo;
 import com.yizhu.auth.exception.AuthException;
 import com.yizhu.auth.utils.TokenUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -18,19 +17,16 @@ import java.util.stream.Collectors;
 
 public class AuthInterceptor implements HandlerInterceptor {
 
-	@Autowired
-	private AuthConfig authConfig;
-	@Autowired
-	private TokenDao tokenDao;
-	@Autowired
-	private TokenUtils tokenUtils;
-
 	private List<String> whiteUrlList;
 	private List<String> whiteTokenList;
 	private Boolean autoRenew;
+	private TokenDao tokenDao;
 
-	@PostConstruct
+
 	public void init() {
+		AuthConfig authConfig = TokenManager.getConfig();
+		tokenDao = TokenManager.getTokenDao();
+
 		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
 		whiteUrlList.add("/favicon.ico");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
@@ -41,7 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		if (doWhiteUrl(request)) return true;
 
-		String token = tokenUtils.getToken();
+		String token = TokenUtils.getToken();
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
 			return true;
 		}

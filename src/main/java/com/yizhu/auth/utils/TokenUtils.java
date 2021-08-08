@@ -1,15 +1,13 @@
 package com.yizhu.auth.utils;
 
+import com.yizhu.auth.TokenManager;
 import com.yizhu.auth.config.AuthConfig;
 import com.yizhu.auth.constant.AuthConstant;
 import com.yizhu.auth.dao.TokenDao;
 import com.yizhu.auth.dao.UserInfo;
 import com.yizhu.auth.exception.AuthException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.DigestUtils;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -19,35 +17,38 @@ import java.util.UUID;
 
 public class TokenUtils {
 
-	@Autowired
-	private TokenDao tokenDao;
-	@Autowired
-	private AuthConfig authConfig;
+	private static TokenDao tokenDao;
 
-	private String tokenName;
-	private String[] readFrom;
-	private Boolean ignoreCamelCase;
-	private List<String> whiteTokenList;
+	private static String tokenName;
+	private static String[] readFrom;
+	private static Boolean ignoreCamelCase;
+	private static List<String> whiteTokenList;
+	private static long timeout;
+	private static String tokenType;
 
-	@PostConstruct
-	public void init() {
+	public static void init() {
+		AuthConfig authConfig = TokenManager.getConfig();
+		tokenDao = TokenManager.getTokenDao();
+
 		tokenName = authConfig.getTokenName().replaceAll("-", "");
 		readFrom = authConfig.getReadFrom().split(",");
 		ignoreCamelCase = authConfig.getIgnoreCamelCase();
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
+		timeout = authConfig.getTimeout();
+		tokenType = authConfig.getTokenType();
 	}
 
-	public String login(UserInfo userInfo) {
+	public static String login(UserInfo userInfo) {
 		String token = getTokenKey();
-		tokenDao.setUserInfo(token, userInfo, authConfig.getTimeout());
+		tokenDao.setUserInfo(token, userInfo, timeout);
 		return token;
 	}
 
-	public void logout() {
+	public static void logout() {
 		tokenDao.deleteUserInfo(getToken());
 	}
 
-	public Long getId() {
+	public static Long getId() {
 		UserInfo user = getUser();
 		if (user == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
@@ -55,7 +56,7 @@ public class TokenUtils {
 		return user.getId();
 	}
 
-	public UserInfo getUser() {
+	public static UserInfo getUser() {
 		String userKey = getToken();
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
@@ -69,7 +70,7 @@ public class TokenUtils {
 		return tokenDao.getUserInfo(userKey);
 	}
 
-	public String getToken() {
+	public static String getToken() {
 		String userKey = "";
 		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
 		for (String from : readFrom) {
@@ -109,8 +110,8 @@ public class TokenUtils {
 	}
 
 
-	private String getTokenKey() {
-		String tokenType = authConfig.getTokenType().toLowerCase();
+	private static String getTokenKey() {
+		tokenType = tokenType.toLowerCase();
 		String token;
 		switch (tokenType) {
 			case AuthConstant.TYPE_RANDOM16:

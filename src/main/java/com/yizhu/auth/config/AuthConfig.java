@@ -114,4 +114,19 @@ public class AuthConfig {
 	public void setWhiteTokenList(String whiteTokenList) {
 		this.whiteTokenList = whiteTokenList;
 	}
+
+	@Override
+	public String toString() {
+		return "AuthConfig{" +
+				"tokenName='" + tokenName + '\'' +
+				", tokenPrefix='" + tokenPrefix + '\'' +
+				", timeout=" + timeout +
+				", readFrom='" + readFrom + '\'' +
+				", ignoreCamelCase=" + ignoreCamelCase +
+				", autoRenew=" + autoRenew +
+				", tokenType='" + tokenType + '\'' +
+				", whiteUrlList='" + whiteUrlList + '\'' +
+				", whiteTokenList='" + whiteTokenList + '\'' +
+				'}';
+	}
 }

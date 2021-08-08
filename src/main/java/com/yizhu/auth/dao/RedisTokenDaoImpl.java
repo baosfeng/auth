@@ -3,12 +3,12 @@ package com.yizhu.auth.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yizhu.auth.TokenManager;
 import com.yizhu.auth.config.AuthConfig;
 import com.yizhu.auth.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.concurrent.TimeUnit;
@@ -22,8 +22,6 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	@Autowired
-	private AuthConfig authConfig;
 	private static final String tokenPrefix = "user:login:";
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -56,6 +54,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 	@Override
 	public void updateUserInfo(String key, UserInfo userInfo) {
 		String tokenKey = getTokenKey(key);
+		AuthConfig authConfig = TokenManager.getConfig();
 		if (authConfig.getAutoRenew()) {
 			setUserInfo(tokenKey, userInfo, authConfig.getTimeout());
 			return;
