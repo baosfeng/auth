@@ -3,3 +3,6 @@ auth:
   token-name: token
 server:
   port: 8080
+spring:
+  redis:
+    url: redis://root:e9xkcVZIGY3A6RoP@159.75.122.3:6379
