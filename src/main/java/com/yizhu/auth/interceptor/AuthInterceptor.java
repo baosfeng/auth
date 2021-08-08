@@ -27,31 +27,36 @@ public class AuthInterceptor implements HandlerInterceptor {
 
 	private List<String> whiteUrlList;
 	private List<String> whiteTokenList;
+	private Boolean autoRenew;
 
 	@PostConstruct
 	public void init() {
 		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
 		whiteUrlList.add("/favicon.ico");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
+		autoRenew = authConfig.getAutoRenew();
 	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		if (doWhiteUrl(request, response)) return true;
+		if (doWhiteUrl(request)) return true;
 
-		String userKey = tokenUtils.getUserTokenValue(request);
-		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
+		String token = tokenUtils.getToken();
+		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
 			return true;
 		}
 
-		UserInfo userInfo = tokenDao.getUserInfo(userKey);
+		UserInfo userInfo = tokenDao.getUserInfo(token);
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
+		}
+		if (autoRenew) {
+			tokenDao.updateUserInfo(token, userInfo);
 		}
 		return true;
 	}
 
-	private boolean doWhiteUrl(HttpServletRequest request, HttpServletResponse response) {
+	private boolean doWhiteUrl(HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		for (String white : whiteUrlList) {
 			if (white.endsWith("*")) {

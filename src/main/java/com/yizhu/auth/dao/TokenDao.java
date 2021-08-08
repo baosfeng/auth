@@ -32,13 +32,6 @@ public interface TokenDao {
 	UserInfo getUserInfo(String key);
 
 	/**
-	 * 写入Object，设置存活时间为默认设置的时间
-	 * @param key 键名称
-	 * @param userInfo 值
-	 */
-	void setUserInfo(String key, UserInfo userInfo);
-
-	/**
 	 * 写入Object，并设定存活时间 (单位: 秒)
 	 *
 	 * @param key     键名称

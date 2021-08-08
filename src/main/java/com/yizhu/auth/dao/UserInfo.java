@@ -5,10 +5,19 @@ package com.yizhu.auth.dao;
  * @date 2021/8/7-9:08
  * @since 1.0
  */
-public interface UserInfo {
-	Long id = null;
+public abstract class UserInfo {
 
-	default Long getId() {
+	/** 用户id */
+	protected Long id;
+
+	public UserInfo() {
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getId() {
 		return id == null ? -1 : id;
 	}
 }

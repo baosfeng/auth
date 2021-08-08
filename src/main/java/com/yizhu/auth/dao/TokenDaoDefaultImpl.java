@@ -32,11 +32,6 @@ public class TokenDaoDefaultImpl implements TokenDao {
 	}
 
 	@Override
-	public void setUserInfo(String key, UserInfo userInfo) {
-		setUserInfo(key, userInfo, EXPIRE_ONE_DAY);
-	}
-
-	@Override
 	public void setUserInfo(String key, UserInfo userInfo, long timeout) {
 		if (timeout == 0 || timeout <= TokenDao.EXPIRE_NOT_EXIST) {
 			return;

@@ -22,11 +22,6 @@ public class RedisTokenDaoImpl implements TokenDao {
 	}
 
 	@Override
-	public void setUserInfo(String key, UserInfo userInfo) {
-
-	}
-
-	@Override
 	public void setUserInfo(String key, UserInfo userInfo, long timeout) {
 
 	}

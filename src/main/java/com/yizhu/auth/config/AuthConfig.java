@@ -29,6 +29,9 @@ public class AuthConfig {
 	/** 是否自动续签 */
 	@NonNull
 	private Boolean autoRenew = true;
+	/** token的生成风格,支持random16,random32,random64,uuid,md5,全局唯一 */
+	@NonNull
+	private String tokenType = "random16";
 	/** url放行白名单,支持通配符* */
 	private String whiteUrlList = "";
 	/** token放行白名单 */
@@ -85,6 +88,15 @@ public class AuthConfig {
 
 	public void setAutoRenew(@NonNull Boolean autoRenew) {
 		this.autoRenew = autoRenew;
+	}
+
+	@NonNull
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	public void setTokenType(@NonNull String tokenType) {
+		this.tokenType = tokenType;
 	}
 
 	public String getWhiteUrlList() {
