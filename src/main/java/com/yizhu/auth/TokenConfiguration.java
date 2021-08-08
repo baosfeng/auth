@@ -7,9 +7,13 @@ import com.yizhu.auth.interceptor.AuthInterceptor;
 import com.yizhu.auth.running.AuthEnvironmentAware;
 import com.yizhu.auth.utils.TokenUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -23,13 +27,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class TokenConfiguration implements WebMvcConfigurer {
 
 	@Bean
-	@ConditionalOnBean(RedisTemplate.class)
+	@Primary
+	@ConditionalOnClass(RedisTemplate.class)
 	public TokenDao redisTokenDao() {
 		return new RedisTokenDaoImpl();
 	}
 
 
 	@Bean
+	@ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
 	public TokenDao defaultTokenDao() {
 		return new TokenDaoDefaultImpl();
 	}

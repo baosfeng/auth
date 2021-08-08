@@ -6,6 +6,7 @@ import com.yizhu.auth.dao.TokenDao;
 import com.yizhu.auth.dao.UserInfo;
 import com.yizhu.auth.exception.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.PostConstruct;
