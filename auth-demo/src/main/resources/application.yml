@@ -1,0 +1,5 @@
+auth:
+  white-url-list: /login
+  token-name: token
+server:
+  port: 8080
