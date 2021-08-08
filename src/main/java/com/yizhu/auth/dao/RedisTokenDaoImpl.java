@@ -1,13 +1,10 @@
 package com.yizhu.auth.dao;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
 import com.yizhu.auth.TokenManager;
 import com.yizhu.auth.config.AuthConfig;
 import com.yizhu.auth.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -24,31 +21,19 @@ public class RedisTokenDaoImpl implements TokenDao {
 	private StringRedisTemplate stringRedisTemplate;
 	private static final String tokenPrefix = "user:login:";
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
-	private final Logger log = LoggerFactory.getLogger(RedisTokenDaoImpl.class);
-
 	@Override
 	public UserInfo getUserInfo(String key) {
 		String json = stringRedisTemplate.opsForValue().get(getTokenKey(key));
 		if (StringUtils.isEmpty(json)) {
 			return null;
 		}
-		try {
-			return objectMapper.readValue(json, UserInfo.class);
-		} catch (JsonProcessingException e) {
-			log.error("获取对象出现异常", e);
-		}
-		return null;
+		return JSON.parseObject(json, UserInfo.class);
 	}
 
 	@Override
 	public void setUserInfo(String key, UserInfo userInfo, long timeout) {
-		try {
-			String json = objectMapper.writeValueAsString(userInfo);
-			stringRedisTemplate.opsForValue().set(getTokenKey(key), json, timeout, TimeUnit.SECONDS);
-		} catch (JsonProcessingException e) {
-			log.error("保存转换对象出现异常", e);
-		}
+		String json = JSON.toJSONString(userInfo);
+		stringRedisTemplate.opsForValue().set(getTokenKey(key), json, timeout, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -59,13 +44,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 			setUserInfo(tokenKey, userInfo, authConfig.getTimeout());
 			return;
 		}
-		try {
-			String json = objectMapper.writeValueAsString(userInfo);
-			long timeout = getTimeout(tokenKey);
-			stringRedisTemplate.opsForValue().set(tokenKey, json, timeout, TimeUnit.SECONDS);
-		} catch (JsonProcessingException e) {
-			log.error("保存转换对象出现异常", e);
-		}
+		String json = JSON.toJSONString(userInfo);
+		long timeout = getTimeout(tokenKey);
+		stringRedisTemplate.opsForValue().set(tokenKey, json, timeout, TimeUnit.SECONDS);
 	}
 
 	@Override

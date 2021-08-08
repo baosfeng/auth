@@ -5,7 +5,7 @@ package com.yizhu.auth.dao;
  * @date 2021/8/7-9:08
  * @since 1.0
  */
-public abstract class UserInfo {
+public class UserInfo {
 
 	/** 用户id */
 	protected Long id;
