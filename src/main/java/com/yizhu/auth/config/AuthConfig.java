@@ -16,7 +16,7 @@ public class AuthConfig {
 	private String tokenName = "every-bim-token";
 	/** token名称保存的前缀 */
 	@NonNull
-	private String tokenPrefix = "user:login:";
+	private String tokenPrefix = "";
 	/** token有效期 */
 	@NonNull
 	private long timeout = 60 * 60 * 24 * 30;

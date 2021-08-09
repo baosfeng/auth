@@ -19,7 +19,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
-	private static final String tokenPrefix = "user:login:";
+	private static final String TOKEN_PREFIX = "user:login:";
 
 	@Override
 	public UserInfo getUserInfo(String key) {
@@ -66,9 +66,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 	}
 
 	private String getTokenKey(String key) {
-		if (key.startsWith(tokenPrefix)) {
+		if (key.startsWith(TOKEN_PREFIX)) {
 			return key;
 		}
-		return tokenPrefix + key;
+		return TOKEN_PREFIX + key;
 	}
 }

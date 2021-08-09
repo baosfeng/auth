@@ -25,6 +25,7 @@ public class TokenUtils {
 	private static List<String> whiteTokenList;
 	private static long timeout;
 	private static String tokenType;
+	private static String tokenPrefix;
 
 	public static void init() {
 		AuthConfig authConfig = TokenManager.getConfig();
@@ -36,6 +37,7 @@ public class TokenUtils {
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType();
+		tokenPrefix = authConfig.getTokenPrefix();
 	}
 
 	public static String login(UserInfo userInfo) {
@@ -132,6 +134,7 @@ public class TokenUtils {
 			default:
 				throw new IllegalArgumentException("token类型不受支持");
 		}
+		token = tokenPrefix + token;
 		while (tokenDao.getUserInfo(token) != null) {
 			token = getTokenKey();
 		}
