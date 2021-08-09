@@ -61,7 +61,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 	}
 
 	private String getTokenKey(String key) {
-		if (key.startsWith(TOKEN_PREFIX)) {
+		if (TOKEN_PREFIX.startsWith(key)) {
 			return key;
 		}
 		return TOKEN_PREFIX + key;

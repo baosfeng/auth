@@ -13,7 +13,7 @@ public class AuthConfig {
 
 	/** token名称 */
 	@NonNull
-	private String tokenName = "every-bim-token";
+	private String tokenName = "token";
 	/** token名称保存的前缀 */
 	@NonNull
 	private String tokenPrefix = "";
