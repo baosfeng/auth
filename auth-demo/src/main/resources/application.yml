@@ -2,6 +2,7 @@ auth:
   white-url-list: /login
   token-name: token
   token-prefix: every
+  read-from: url
 server:
   port: 8080
 spring:

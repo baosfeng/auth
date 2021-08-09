@@ -1,4 +1,4 @@
-package com.yizhu.auth.dao;
+package xyz.bsfeng.auth.dao;
 
 
 import java.util.Map;
@@ -33,17 +33,17 @@ public class TokenDaoDefaultImpl implements TokenDao {
 
 	@Override
 	public void setUserInfo(String key, UserInfo userInfo, long timeout) {
-		if (timeout == 0 || timeout <= TokenDao.EXPIRE_NOT_EXIST) {
+		if (timeout == 0 || timeout <= EXPIRE_NOT_EXIST) {
 			return;
 		}
 		dataMap.put(key, userInfo);
-		expireMap.put(key, (timeout == TokenDao.EXPIRE_NEVER) ? (TokenDao.EXPIRE_NEVER) : (System.currentTimeMillis() + timeout * 1000));
+		expireMap.put(key, (timeout == EXPIRE_NEVER) ? (EXPIRE_NEVER) : (System.currentTimeMillis() + timeout * 1000));
 	}
 
 	@Override
 	public void updateUserInfo(String key, UserInfo userInfo) {
 		long expireTime = getKeyTimeout(key);
-		if (expireTime == TokenDao.EXPIRE_NOT_EXIST || expireTime == TokenDao.EXPIRE_NEVER) {
+		if (expireTime == EXPIRE_NOT_EXIST || expireTime == EXPIRE_NEVER) {
 			return;
 		}
 		dataMap.put(key, userInfo);
@@ -78,7 +78,7 @@ public class TokenDaoDefaultImpl implements TokenDao {
 	void clearKeyByTimeout(String key) {
 		Long expirationTime = expireMap.get(key);
 		// 清除条件：如果不为空 && 不是[永不过期] && 已经超过过期时间
-		if (expirationTime != null && expirationTime != TokenDao.EXPIRE_NEVER && expirationTime < System.currentTimeMillis()) {
+		if (expirationTime != null && expirationTime != EXPIRE_NEVER && expirationTime < System.currentTimeMillis()) {
 			dataMap.remove(key);
 			expireMap.remove(key);
 		}
@@ -94,11 +94,11 @@ public class TokenDaoDefaultImpl implements TokenDao {
 		Long expire = expireMap.get(key);
 		// 如果根本没有这个值
 		if (expire == null) {
-			return TokenDao.EXPIRE_NOT_EXIST;
+			return EXPIRE_NOT_EXIST;
 		}
 		// 如果被标注为永不过期
-		if (expire == TokenDao.EXPIRE_NEVER) {
-			return TokenDao.EXPIRE_NEVER;
+		if (expire == EXPIRE_NEVER) {
+			return EXPIRE_NEVER;
 		}
 		// ---- 计算剩余时间并返回
 		long timeout = (expire - System.currentTimeMillis()) / 1000;
@@ -106,7 +106,7 @@ public class TokenDaoDefaultImpl implements TokenDao {
 		if (timeout < 0) {
 			dataMap.remove(key);
 			expireMap.remove(key);
-			return TokenDao.EXPIRE_NOT_EXIST;
+			return EXPIRE_NOT_EXIST;
 		}
 		return timeout;
 	}

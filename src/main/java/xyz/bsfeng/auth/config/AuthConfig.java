@@ -1,4 +1,4 @@
-package com.yizhu.auth.config;
+package xyz.bsfeng.auth.config;
 
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;

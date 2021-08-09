@@ -1,8 +1,8 @@
-package com.yizhu.auth.utils;
+package xyz.bsfeng.auth.utils;
 
 
-import com.yizhu.auth.constant.AuthConstant;
-import com.yizhu.auth.exception.AuthException;
+import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.exception.AuthException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 

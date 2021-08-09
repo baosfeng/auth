@@ -1,7 +1,7 @@
 package com.example;
 
-import com.yizhu.auth.TokenManager;
-import com.yizhu.auth.utils.TokenUtils;
+import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

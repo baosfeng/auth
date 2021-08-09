@@ -1,4 +1,4 @@
-package com.yizhu.auth.exception;
+package xyz.bsfeng.auth.exception;
 
 public class AuthException extends RuntimeException {
 

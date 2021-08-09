@@ -1,13 +1,13 @@
-package com.yizhu.auth.running;
+package xyz.bsfeng.auth.running;
 
-import com.yizhu.auth.TokenManager;
-import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.dao.RedisTokenDaoImpl;
-import com.yizhu.auth.dao.TokenDao;
-import com.yizhu.auth.dao.TokenDaoDefaultImpl;
-import com.yizhu.auth.exception.AuthParamException;
-import com.yizhu.auth.interceptor.AuthInterceptor;
-import com.yizhu.auth.utils.TokenUtils;
+import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
+import xyz.bsfeng.auth.exception.AuthParamException;
+import xyz.bsfeng.auth.interceptor.AuthInterceptor;
+import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;

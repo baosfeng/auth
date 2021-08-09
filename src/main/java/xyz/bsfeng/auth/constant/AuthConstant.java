@@ -1,4 +1,4 @@
-package com.yizhu.auth.constant;
+package xyz.bsfeng.auth.constant;
 
 public interface AuthConstant {
 

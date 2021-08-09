@@ -1,12 +1,14 @@
-package com.yizhu.auth.interceptor;
+package xyz.bsfeng.auth.interceptor;
 
-import com.yizhu.auth.TokenManager;
-import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.constant.AuthConstant;
-import com.yizhu.auth.dao.TokenDao;
-import com.yizhu.auth.dao.UserInfo;
-import com.yizhu.auth.exception.AuthException;
-import com.yizhu.auth.utils.TokenUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.UserInfo;
+import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 public class AuthInterceptor implements HandlerInterceptor {
 
+	private final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
 	private List<String> whiteUrlList;
 	private List<String> whiteTokenList;
 	private Boolean autoRenew;
@@ -29,12 +32,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 
 		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
 		whiteUrlList.add("/favicon.ico");
+		whiteUrlList.add("/error");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		autoRenew = authConfig.getAutoRenew();
 	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+		log.info("正在访问{}", request.getRequestURI());
 		if (doWhiteUrl(request)) return true;
 
 		String token = TokenUtils.getToken();
@@ -42,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 			return true;
 		}
 
-		UserInfo userInfo = tokenDao.getUserInfo(token);
+		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}

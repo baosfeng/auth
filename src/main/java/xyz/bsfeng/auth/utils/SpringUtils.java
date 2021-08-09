@@ -1,4 +1,4 @@
-package com.yizhu.auth.utils;
+package xyz.bsfeng.auth.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

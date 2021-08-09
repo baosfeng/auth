@@ -1,7 +1,7 @@
-package com.yizhu.auth.exception;
+package xyz.bsfeng.auth.exception;
 
-import com.yizhu.auth.result.Response;
-import com.yizhu.auth.utils.SpringMVCUtil;
+import xyz.bsfeng.auth.result.Response;
+import xyz.bsfeng.auth.utils.SpringMVCUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;

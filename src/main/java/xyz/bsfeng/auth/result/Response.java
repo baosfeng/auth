@@ -1,4 +1,4 @@
-package com.yizhu.auth.result;
+package xyz.bsfeng.auth.result;
 
 
 /**

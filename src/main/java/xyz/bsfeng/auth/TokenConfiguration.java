@@ -1,13 +1,5 @@
-package com.yizhu.auth;
+package xyz.bsfeng.auth;
 
-import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.dao.RedisTokenDaoImpl;
-import com.yizhu.auth.dao.TokenDao;
-import com.yizhu.auth.dao.TokenDaoDefaultImpl;
-import com.yizhu.auth.exception.AuthExceptionHandler;
-import com.yizhu.auth.interceptor.AuthInterceptor;
-import com.yizhu.auth.running.AuthEnvironmentAware;
-import com.yizhu.auth.utils.SpringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,9 +7,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
+import xyz.bsfeng.auth.exception.AuthExceptionHandler;
+import xyz.bsfeng.auth.interceptor.AuthInterceptor;
+import xyz.bsfeng.auth.running.AuthEnvironmentAware;
+import xyz.bsfeng.auth.utils.SpringUtils;
 
 /**
  * @author bsfeng
@@ -30,8 +33,19 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	@Bean
 	@Primary
 	@ConditionalOnClass(RedisTemplate.class)
-	public TokenDao redisTokenDao() {
-		return new RedisTokenDaoImpl();
+	public TokenDao redisTokenDao(RedisConnectionFactory connectionFactory) {
+		StringRedisSerializer keySerializer = new StringRedisSerializer();
+		GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+		// 构建RedisTemplate
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setConnectionFactory(connectionFactory);
+		redisTemplate.setConnectionFactory(connectionFactory);
+		redisTemplate.setKeySerializer(keySerializer);
+		redisTemplate.setHashKeySerializer(keySerializer);
+		redisTemplate.setValueSerializer(valueSerializer);
+		redisTemplate.setHashValueSerializer(valueSerializer);
+		redisTemplate.afterPropertiesSet();
+		return new RedisTokenDaoImpl(redisTemplate);
 	}
 
 

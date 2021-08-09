@@ -1,6 +1,6 @@
-package com.yizhu.auth.running;
+package xyz.bsfeng.auth.running;
 
-import com.yizhu.auth.exception.AuthParamException;
+import xyz.bsfeng.auth.exception.AuthParamException;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 

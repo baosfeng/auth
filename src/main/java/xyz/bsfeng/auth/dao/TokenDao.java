@@ -1,9 +1,5 @@
-package com.yizhu.auth.dao;
+package xyz.bsfeng.auth.dao;
 
-
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 /**
  * Sa-Token持久层接口
@@ -29,7 +25,7 @@ public interface TokenDao {
 	 * @param key 键名称
 	 * @return object
 	 */
-	UserInfo getUserInfo(String key);
+	Object getUserInfo(String key);
 
 	/**
 	 * 写入Object，并设定存活时间 (单位: 秒)

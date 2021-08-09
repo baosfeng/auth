@@ -1,11 +1,11 @@
-package com.yizhu.auth.utils;
+package xyz.bsfeng.auth.utils;
 
-import com.yizhu.auth.TokenManager;
-import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.constant.AuthConstant;
-import com.yizhu.auth.dao.TokenDao;
-import com.yizhu.auth.dao.UserInfo;
-import com.yizhu.auth.exception.AuthException;
+import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.UserInfo;
+import xyz.bsfeng.auth.exception.AuthException;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,14 +62,9 @@ public class TokenUtils {
 		String userKey = getToken();
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
-			return new UserInfo() {
-				@Override
-				public Long getId() {
-					return -1L;
-				}
-			};
+			return () -> -1L;
 		}
-		return tokenDao.getUserInfo(userKey);
+		return (UserInfo) tokenDao.getUserInfo(userKey);
 	}
 
 	public static String getToken() {

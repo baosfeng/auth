@@ -1,10 +1,10 @@
-package com.yizhu.auth;
+package xyz.bsfeng.auth;
 
-import com.yizhu.auth.config.AuthConfig;
-import com.yizhu.auth.dao.RedisTokenDaoImpl;
-import com.yizhu.auth.dao.TokenDao;
-import com.yizhu.auth.dao.TokenDaoDefaultImpl;
-import com.yizhu.auth.utils.SpringUtils;
+import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
+import xyz.bsfeng.auth.utils.SpringUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 public class TokenManager {
