@@ -73,12 +73,10 @@ public class TokenUtils {
 	public static String getToken() {
 		String userKey = "";
 		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
-		System.out.println(servletRequest);
 		for (String from : readFrom) {
 			if (StringUtils.isNotEmpty(userKey)) {
 				break;
 			}
-			System.out.println(tokenName);
 			switch (from) {
 				case AuthConstant.READ_FROM_HEADER:
 					if (!ignoreCamelCase) {
