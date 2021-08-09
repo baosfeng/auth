@@ -31,9 +31,12 @@ public class TokenUtils {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
 
-		tokenName = authConfig.getTokenName().replaceAll("-", "");
-		readFrom = authConfig.getReadFrom().split(",");
+		tokenName = authConfig.getTokenName();
 		ignoreCamelCase = authConfig.getIgnoreCamelCase();
+		if (ignoreCamelCase) {
+			tokenName = authConfig.getTokenName().replaceAll("-", "");
+		}
+		readFrom = authConfig.getReadFrom().split(",");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType();
@@ -70,11 +73,17 @@ public class TokenUtils {
 	public static String getToken() {
 		String userKey = "";
 		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
+		System.out.println(servletRequest);
 		for (String from : readFrom) {
+			if (StringUtils.isNotEmpty(userKey)) {
+				break;
+			}
+			System.out.println(tokenName);
 			switch (from) {
 				case AuthConstant.READ_FROM_HEADER:
 					if (!ignoreCamelCase) {
-						return servletRequest.getHeader(tokenName);
+						userKey =  servletRequest.getHeader(tokenName);
+						break;
 					}
 					Enumeration<String> headerNames = servletRequest.getHeaderNames();
 					while (headerNames.hasMoreElements()) {
@@ -86,7 +95,7 @@ public class TokenUtils {
 					break;
 				case AuthConstant.READ_FROM_URL:
 					if (!ignoreCamelCase) {
-						return servletRequest.getParameter(tokenName);
+						userKey =  servletRequest.getParameter(tokenName);
 					}
 					Enumeration<String> parameterNames = servletRequest.getParameterNames();
 					while (parameterNames.hasMoreElements()) {
