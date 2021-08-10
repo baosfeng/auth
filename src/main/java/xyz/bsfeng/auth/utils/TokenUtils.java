@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.utils;
 
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -10,10 +11,7 @@ import xyz.bsfeng.auth.exception.AuthException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TokenUtils {
 
@@ -44,8 +42,19 @@ public class TokenUtils {
 	}
 
 	public static String login(UserInfo userInfo) {
+		List<String> tokenList = tokenDao.getTokenListById(userInfo.getId());
+		if (TokenManager.getConfig().getGlobalShare()) {
+			if (!CollectionUtils.isEmpty(tokenList)) {
+				return tokenList.get(0);
+			}
+		}
 		String token = getTokenKey();
 		tokenDao.setUserInfo(token, userInfo, timeout);
+		if (tokenList == null) {
+			tokenList = new ArrayList<>();
+		}
+		tokenList.add(token);
+		tokenDao.setTokenListById(userInfo.getId(), tokenList);
 		return token;
 	}
 
@@ -80,8 +89,7 @@ public class TokenUtils {
 			switch (from) {
 				case AuthConstant.READ_FROM_HEADER:
 					if (!ignoreCamelCase) {
-						userKey =  servletRequest.getHeader(tokenName);
-						break;
+						userKey = servletRequest.getHeader(tokenName);
 					}
 					Enumeration<String> headerNames = servletRequest.getHeaderNames();
 					while (headerNames.hasMoreElements()) {

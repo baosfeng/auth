@@ -1,6 +1,7 @@
 package xyz.bsfeng.auth.dao;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,6 +66,16 @@ public class TokenDaoDefaultImpl implements TokenDao {
 	@Override
 	public void updateTimeout(String key, long timeout) {
 		expireMap.put(key, System.currentTimeMillis() + timeout * 1000);
+	}
+
+	@Override
+	public List<String> getTokenListById(Long id) {
+		return null;
+	}
+
+	@Override
+	public void setTokenListById(Long id, List<String> tokenList) {
+
 	}
 
 

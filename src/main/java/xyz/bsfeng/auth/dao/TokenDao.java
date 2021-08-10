@@ -1,6 +1,8 @@
 package xyz.bsfeng.auth.dao;
 
 
+import java.util.List;
+
 /**
  * Sa-Token持久层接口
  *
@@ -30,7 +32,7 @@ public interface TokenDao {
 	/**
 	 * 写入Object，并设定存活时间 (单位: 秒)
 	 *
-	 * @param key     键名称
+	 * @param key     键名称,即用户token
 	 * @param userInfo  值
 	 * @param timeout 存活时间 (值大于0时限时存储，值=-1时永久存储，值=0或小于-2时不存储)
 	 */
@@ -66,5 +68,23 @@ public interface TokenDao {
 	 * @param timeout 过期时间
 	 */
 	void updateTimeout(String key, long timeout);
+
+	// --------------------- 控制用户拥有的token ---------------------
+
+	/**
+	 * 根据用户的id去查询锁拥有的token数量
+	 *
+	 * @param id
+	 * @return
+	 */
+	List<String> getTokenListById(Long id);
+
+	/**
+	 * 设置用户拥有的token集合
+	 *
+	 * @param id
+	 * @param tokenList
+	 */
+	void setTokenListById(Long id, List<String> tokenList);
 
 }

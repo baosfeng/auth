@@ -5,7 +5,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author bsfeng
@@ -14,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisTokenDaoImpl implements TokenDao {
 
-	private RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, Object> redisTemplate;
 	public RedisTokenDaoImpl(RedisTemplate<String, Object> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
@@ -58,6 +62,32 @@ public class RedisTokenDaoImpl implements TokenDao {
 	@Override
 	public void updateTimeout(String key, long timeout) {
 		redisTemplate.expire(getTokenKey(key), timeout, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public List<String> getTokenListById(Long id) {
+		// 一个id对应多个token
+		String idKey = getTokenKey(id + "");
+		Object o = redisTemplate.opsForValue().get(idKey);
+		if (o == null) {
+			return null;
+		}
+		return Arrays.stream(o.toString().split(",")).collect(Collectors.toList());
+	}
+
+	@Override
+	public void setTokenListById(Long id, List<String> tokenList) {
+		ArrayList<String> tokenStringList = new ArrayList<>();
+		long maxExpireTime = 0;
+		for (String token : tokenList) {
+			Long expire = redisTemplate.getExpire(getTokenKey(token));
+			if (expire != null && expire != -2) {
+				tokenStringList.add(token);
+				maxExpireTime = Math.max(maxExpireTime, expire);
+			}
+		}
+		String joinList = String.join(",", tokenStringList);
+		redisTemplate.opsForValue().set(getTokenKey(id + ""), joinList, maxExpireTime, TimeUnit.SECONDS);
 	}
 
 	private String getTokenKey(String key) {
