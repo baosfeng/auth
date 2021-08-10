@@ -1,12 +1,12 @@
 package xyz.bsfeng.auth.utils;
 
+import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
-import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -85,9 +85,11 @@ public class TokenUtils {
 					}
 					Enumeration<String> headerNames = servletRequest.getHeaderNames();
 					while (headerNames.hasMoreElements()) {
-						String element = headerNames.nextElement().replaceAll("-", "").trim();
+						String originHeader = headerNames.nextElement();
+						String element = originHeader.replaceAll("-", "").trim();
 						if (element.equalsIgnoreCase(tokenName)) {
-							return servletRequest.getHeader(element);
+							userKey = servletRequest.getHeader(originHeader);
+							break;
 						}
 					}
 					break;
@@ -97,9 +99,11 @@ public class TokenUtils {
 					}
 					Enumeration<String> parameterNames = servletRequest.getParameterNames();
 					while (parameterNames.hasMoreElements()) {
-						String element = parameterNames.nextElement();
+						String originParam = parameterNames.nextElement();
+						String element = originParam.replaceAll("-", "").trim();
 						if (element.equalsIgnoreCase(tokenName)) {
-							return servletRequest.getParameter(element);
+							userKey = servletRequest.getParameter(originParam);
+							break;
 						}
 					}
 					break;
