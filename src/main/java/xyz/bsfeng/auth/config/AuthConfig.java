@@ -19,7 +19,7 @@ public class AuthConfig {
 	private String tokenPrefix = "";
 	/** token有效期 */
 	@NonNull
-	private long timeout = 60 * 60 * 24 * 30;
+	private long timeout = 60 * 60 * 24;
 	/** token的来源 */
 	@NonNull
 	private String readFrom = "header,url";
