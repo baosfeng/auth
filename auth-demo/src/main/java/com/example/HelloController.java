@@ -18,7 +18,17 @@ public class HelloController {
 
 	@GetMapping("/info")
 	public Long getUserId() {
-		return TokenUtils.getId();
+		Long id = TokenUtils.getId();
+		UserTemp temp = new UserTemp();
+		temp.setId(id);
+		TokenUtils.checkTempUser(temp);
+		return id;
+	}
+
+	@GetMapping("/temp")
+	public String tempLogin() {
+		UserTemp userTemp = new UserTemp();
+		return TokenUtils.loginTemp(userTemp,100L);
 	}
 
 	@GetMapping("/logout")

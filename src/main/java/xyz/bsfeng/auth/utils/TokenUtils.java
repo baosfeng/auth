@@ -5,6 +5,7 @@ import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
@@ -24,6 +25,9 @@ public class TokenUtils {
 	private static long timeout;
 	private static String tokenType;
 	private static String tokenPrefix;
+
+	public TokenUtils() {
+	}
 
 	public static void init() {
 		AuthConfig authConfig = TokenManager.getConfig();
@@ -58,6 +62,27 @@ public class TokenUtils {
 		return token;
 	}
 
+	public static String loginTemp(TempUser authUser, Long expireTime) {
+		Long id = getId();
+		authUser.setId(id);
+		List<String> tokenList = tokenDao.getTokenListById(id);
+		String token = getTokenKey();
+		tokenDao.setUserInfo(token, authUser, expireTime);
+		tokenList.add(token);
+		tokenDao.setTokenListById(id, tokenList);
+		return token;
+	}
+
+	public static void checkTempUser(TempUser authUser) {
+		UserInfo user = getUser();
+		if (user instanceof TempUser) {
+			TempUser tempUser = (TempUser) (user);
+			if (!tempUser.check(authUser)) {
+				throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
+			}
+		}
+	}
+
 	public static void logout() {
 		tokenDao.deleteUserInfo(getToken());
 	}
@@ -74,7 +99,17 @@ public class TokenUtils {
 		String userKey = getToken();
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
-			return () -> -1L;
+			return new UserInfo() {
+				@Override
+				public Long getId() {
+					return -1L;
+				}
+
+				@Override
+				public void setId(Long id) {
+
+				}
+			};
 		}
 		return (UserInfo) tokenDao.getUserInfo(userKey);
 	}

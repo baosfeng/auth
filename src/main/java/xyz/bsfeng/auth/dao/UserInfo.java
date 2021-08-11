@@ -11,4 +11,6 @@ package xyz.bsfeng.auth.dao;
 public interface UserInfo {
 
 	Long getId();
+
+	void setId(Long id);
 }

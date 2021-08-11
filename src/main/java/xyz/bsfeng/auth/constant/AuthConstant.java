@@ -18,6 +18,10 @@ public interface AuthConstant {
 	Integer NOT_SUPPORT_CODE = 402;
 	/** 获取request失败 */
 	String NOT_SUPPORT_MESSAGE = "非Web上下文无法获取Request";
+	/** 临时token过期 */
+	Integer TEMP_TOKEN_VALID_CODE = 403;
+	/** 临时token已过期 */
+	String TEMP_TOKEN_VALID_MESSAGE = "临时token已过期";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */
