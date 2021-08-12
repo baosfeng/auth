@@ -42,7 +42,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 		// 更新临时身份用户信息
 		if (userInfo instanceof TempUser) {
 			long timeout = getTimeout(tokenKey);
-			redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
+			if (0 < timeout) {
+				redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
+			}
 			return;
 		}
 		// 防止出现封禁时间小于key过期时间
@@ -54,7 +56,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 		}
 		long expireTime = getTimeout(tokenKey);
 		long maxTimeout = Math.max(expireTime, userInfo.getLockTime() - System.currentTimeMillis());
-		redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
+		if (0 < timeout) {
+			redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
+		}
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 	@Override
 	public long getTimeout(String key) {
 		Long expire = redisTemplate.getExpire(getTokenKey(key), TimeUnit.SECONDS);
-		return expire == null ? 0 : expire;
+		return expire == null ? -2 : expire;
 	}
 
 	@Override
