@@ -85,7 +85,6 @@ public class TokenUtils {
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
 		Long id = getId();
 		authUser.setId(id);
-		List<String> tokenList = tokenDao.getTokenListById(id);
 		String token;
 		if (StringUtils.isNotEmpty(field)) {
 			token = DigestUtils.md5DigestAsHex(field.getBytes(StandardCharsets.UTF_8));
@@ -93,8 +92,6 @@ public class TokenUtils {
 			token = getTokenKey();
 		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
-		tokenList.add(token);
-		tokenDao.setTokenListById(id, tokenList);
 		return token;
 	}
 
