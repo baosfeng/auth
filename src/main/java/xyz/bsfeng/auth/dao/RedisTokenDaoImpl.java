@@ -39,6 +39,12 @@ public class RedisTokenDaoImpl implements TokenDao {
 	@Override
 	public void updateUserInfo(String key, UserInfo userInfo) {
 		String tokenKey = getTokenKey(key);
+		// 更新临时身份用户信息
+		if (userInfo instanceof TempUser) {
+			long timeout = getTimeout(tokenKey);
+			redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
+			return;
+		}
 		AuthConfig authConfig = TokenManager.getConfig();
 		if (authConfig.getAutoRenew()) {
 			setUserInfo(tokenKey, userInfo, authConfig.getTimeout());
@@ -55,8 +61,8 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Override
 	public long getTimeout(String key) {
-		Long expire = redisTemplate.getExpire(getTokenKey(key));
-		return expire == null ? -2 : expire;
+		Long expire = redisTemplate.getExpire(getTokenKey(key), TimeUnit.SECONDS);
+		return expire == null ? 0 : expire;
 	}
 
 	@Override
