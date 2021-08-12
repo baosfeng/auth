@@ -82,6 +82,13 @@ public class TokenUtils {
 				if (!check) {
 					throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
 				}
+
+				// 一般来说,临时身份校验完毕,身份的权限可使用信息都会被消耗一部分,因此要及时更新
+				String token = getToken();
+				long timeout = tokenDao.getTimeout(token);
+				if (timeout > 0) {
+					loginTemp(tempUser, timeout);
+				}
 			} catch (RuntimeException e) {
 				throw e;
 			}
