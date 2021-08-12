@@ -77,8 +77,13 @@ public class TokenUtils {
 		UserInfo user = getUser();
 		if (user instanceof TempUser) {
 			TempUser tempUser = (TempUser) (user);
-			if (!tempUser.check(authUser)) {
-				throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
+			try {
+				boolean check = tempUser.check(authUser);
+				if (!check) {
+					throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
+				}
+			} catch (RuntimeException e) {
+				throw e;
 			}
 		}
 	}

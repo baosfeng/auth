@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.dao;
 
+import xyz.bsfeng.auth.exception.AuthException;
+
 import java.util.Objects;
 
 /**
@@ -16,7 +18,7 @@ public interface TempUser extends UserInfo {
 	 * @param tempUser
 	 * @return
 	 */
-	default boolean check(TempUser tempUser) {
+	default boolean check(TempUser tempUser) throws AuthException {
 		return Objects.equals(this, tempUser);
 	};
 }
