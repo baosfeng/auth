@@ -41,7 +41,7 @@ public class TokenUtils {
 		readFrom = authConfig.getReadFrom().split(",");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		timeout = authConfig.getTimeout();
-		tokenType = authConfig.getTokenType();
+		tokenType = authConfig.getTokenType().toLowerCase();
 		tokenPrefix = authConfig.getTokenPrefix();
 	}
 
@@ -63,10 +63,27 @@ public class TokenUtils {
 	}
 
 	public static String loginTemp(TempUser authUser, Long expireTime) {
+		return loginTemp(authUser, expireTime, null);
+	}
+
+	/**
+	 * 使用临时身份进行登录
+	 *
+	 * @param authUser   临时身份
+	 * @param expireTime 过期时间
+	 * @param field      用于标记是否要为同一个资源生成同一份token,常用于资源缓存
+	 * @return
+	 */
+	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
 		Long id = getId();
 		authUser.setId(id);
 		List<String> tokenList = tokenDao.getTokenListById(id);
-		String token = getTokenKey();
+		String token;
+		if (StringUtils.isNotEmpty(field)) {
+			token = DigestUtils.md5DigestAsHex(field.getBytes(StandardCharsets.UTF_8));
+		} else {
+			token = getTokenKey();
+		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		tokenList.add(token);
 		tokenDao.setTokenListById(id, tokenList);
@@ -150,7 +167,7 @@ public class TokenUtils {
 					break;
 				case AuthConstant.READ_FROM_URL:
 					if (!ignoreCamelCase) {
-						userKey =  servletRequest.getParameter(tokenName);
+						userKey = servletRequest.getParameter(tokenName);
 					}
 					Enumeration<String> parameterNames = servletRequest.getParameterNames();
 					while (parameterNames.hasMoreElements()) {
@@ -174,7 +191,6 @@ public class TokenUtils {
 
 
 	private static String getTokenKey() {
-		tokenType = tokenType.toLowerCase();
 		String token;
 		switch (tokenType) {
 			case AuthConstant.TYPE_RANDOM16:
