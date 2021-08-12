@@ -5,8 +5,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -90,17 +90,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Override
 	public void setTokenListById(Long id, List<String> tokenList) {
-		ArrayList<String> tokenStringList = new ArrayList<>();
-		long maxExpireTime = 0;
-		for (String token : tokenList) {
-			Long expire = redisTemplate.getExpire(getTokenKey(token));
-			if (expire != null && expire != -2) {
-				tokenStringList.add(token);
-				maxExpireTime = Math.max(maxExpireTime, expire);
-			}
-		}
-		String joinList = String.join(",", tokenStringList);
-		redisTemplate.opsForValue().set(getTokenKey(id + ""), joinList, maxExpireTime, TimeUnit.SECONDS);
+		HashSet<String> tokenStringSet = new HashSet<>(tokenList);
+		String joinList = String.join(",", tokenStringSet);
+		redisTemplate.opsForValue().set(getTokenKey(id + ""), joinList, TokenManager.getConfig().getTimeout(), TimeUnit.SECONDS);
 	}
 
 	@Override
