@@ -80,7 +80,7 @@ public class TokenUtils {
 	 * @param authUser   临时身份
 	 * @param expireTime 过期时间
 	 * @param field      用于标记是否要为同一个资源生成同一份token,常用于资源缓存
-	 * @return
+	 * @return 登录token
 	 */
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
 		Long id = getId();
@@ -138,7 +138,7 @@ public class TokenUtils {
 	/**
 	 * 根据指定的token进行踢出用户
 	 *
-	 * @param token
+	 * @param token 当前正在使用的token
 	 */
 	public static void kickOut(String token) {
 		if (StringUtils.isEmpty(token)) {
@@ -149,13 +149,14 @@ public class TokenUtils {
 
 	/**
 	 * 封锁时间为秒
-	 * @param lockTime
+	 *
+	 * @param lockTime 封禁的时间
 	 */
 	public static void lock(long lockTime) {
 		if (lockTime < 0) {
 			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
 		}
-		UserInfo user = getUser();
+		UserInfo user = getUserInfo();
 		user.setLock(true);
 		// 方便时间过期之后修改回正常未锁定的样子
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
@@ -169,25 +170,7 @@ public class TokenUtils {
 
 	public static UserInfo getUser() {
 		String userKey = getToken();
-		// 如果为白名单token, 返回-1
-		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
-			return new UserInfo() {
-				@Override
-				public Long getId() {
-					return -1L;
-				}
-
-				@Override
-				public void setId(Long id) {
-
-				}
-
-			};
-		}
-		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(userKey);
-		if (userInfo == null) {
-			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
-		}
+		UserInfo userInfo = getUserInfo();
 		if (userInfo.getLock()) {
 			long millis = System.currentTimeMillis();
 			if (millis < userInfo.getLockTime()) {
@@ -199,6 +182,7 @@ public class TokenUtils {
 		}
 		return userInfo;
 	}
+
 
 	public static String getToken() {
 		String userKey = "";
@@ -273,5 +257,34 @@ public class TokenUtils {
 			token = getTokenKey();
 		}
 		return token;
+	}
+
+	/**
+	 * 不提供对外使用，仅限工具类内部使用，不做账号是否过期校验
+	 *
+	 * @return 账户相关信息
+	 */
+	private static UserInfo getUserInfo() {
+		String userKey = getToken();
+		// 如果为白名单token, 返回-1
+		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
+			return new UserInfo() {
+				@Override
+				public Long getId() {
+					return -1L;
+				}
+
+				@Override
+				public void setId(Long id) {
+
+				}
+
+			};
+		}
+		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(userKey);
+		if (userInfo == null) {
+			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
+		}
+		return userInfo;
 	}
 }
