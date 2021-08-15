@@ -38,6 +38,12 @@ public class HelloController {
 		return "踢出成功";
 	}
 
+	@GetMapping("/lock")
+	public String lock() {
+		TokenUtils.lock(100L);
+		return "封禁成功";
+	}
+
 	@HasRole("all")
 	@GetMapping("/role/check")
 	public Long getRole() {

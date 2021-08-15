@@ -8,17 +8,33 @@ package xyz.bsfeng.auth.dao;
  * @date 2021/8/7-9:08
  * @since 1.0
  */
-public interface UserInfo {
+public abstract class UserInfo {
 
-	Long getId();
+	Boolean lock = false;
+	Long lockTime = 0L;
+	public abstract Long getId();
 
-	void setId(Long id);
+	public abstract void setId(Long id);
 
-	default String[] getRoles() {
+	public String[] getRoles() {
 		return new String[]{};
-	};
+	}
 
-	default void setRoles(String... auths) {
+	public void setRoles(String... auths) {}
 
-	};
+	public Boolean getLock() {
+		return lock;
+	}
+
+	public void setLock(Boolean lock) {
+		this.lock = lock;
+	}
+
+	public Long getLockTime() {
+		return lockTime;
+	}
+
+	public void setLockTime(Long lockTime) {
+		this.lockTime = lockTime;
+	}
 }

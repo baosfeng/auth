@@ -2,11 +2,13 @@ package com.example;
 
 import xyz.bsfeng.auth.dao.UserInfo;
 
-public class User implements UserInfo {
+public class User extends UserInfo {
 
 	private String mobilePhone;
 	private Long id;
 	private String[] auths;
+	private Long lockTime;
+	private Boolean lock;
 
 	public User() {
 	}

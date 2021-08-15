@@ -11,14 +11,14 @@ import java.util.Objects;
  * @author bsfeng
  * @date 2021/8/11 17:44
  */
-public interface TempUser extends UserInfo {
+public abstract class TempUser extends UserInfo {
 	/**
 	 * 需要自定义的验证方法
 	 * 默认根据对象是否一致判断权限是否满足
 	 * @param tempUser
 	 * @return
 	 */
-	default boolean check(TempUser tempUser) throws AuthException {
+	public boolean check(TempUser tempUser) throws AuthException {
 		return Objects.equals(this, tempUser);
 	};
 }

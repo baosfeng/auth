@@ -6,7 +6,7 @@ import xyz.bsfeng.auth.dao.TempUser;
  * @author bsfeng
  * @date 2021/8/11 18:30
  */
-public class UserTemp implements TempUser {
+public class UserTemp extends TempUser {
 	private Long id;
 
 	@Override

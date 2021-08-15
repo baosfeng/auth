@@ -34,6 +34,14 @@ public interface AuthConstant {
 	Integer KICK_OUT_TOKEN_EMPTY_CODE = 406;
 	/** 踢出的用户token不能为空 */
 	String KICK_OUT_TOKEN_EMPTY_MESSAGE = "踢出的用户token不能为空！";
+	/** 踢出的用户token不能为空 */
+	Integer LOCK_USER_TIME_VALID_CODE = 407;
+	/** 封禁时间不能小于0 */
+	String LOCK_USER_TIME_VALID_MESSAGE = "封禁时间不能小于0！";
+	/** 该账号已被封禁，解封时间还有 */
+	Integer ACCOUNT_LOCK_CODE = 408;
+	/** 该账号已被封禁，解封时间还有 */
+	String ACCOUNT_LOCK_MESSAGE = "该账号已被封禁，解封时间还有！";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */

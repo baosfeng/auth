@@ -45,13 +45,16 @@ public class RedisTokenDaoImpl implements TokenDao {
 			redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
 			return;
 		}
+		// 防止出现封禁时间小于key过期时间
 		AuthConfig authConfig = TokenManager.getConfig();
 		if (authConfig.getAutoRenew()) {
-			setUserInfo(tokenKey, userInfo, authConfig.getTimeout());
+			long maxTimeout = Math.max(authConfig.getTimeout(), userInfo.getLockTime() - System.currentTimeMillis());
+			setUserInfo(tokenKey, userInfo, maxTimeout);
 			return;
 		}
-		long timeout = getTimeout(tokenKey);
-		redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
+		long expireTime = getTimeout(tokenKey);
+		long maxTimeout = Math.max(expireTime, userInfo.getLockTime() - System.currentTimeMillis());
+		redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
 	}
 
 	@Override

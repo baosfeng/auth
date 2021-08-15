@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static xyz.bsfeng.auth.constant.AuthConstant.*;
+
 public class TokenUtils {
 
 	private static TokenDao tokenDao;
@@ -51,7 +53,7 @@ public class TokenUtils {
 			if (!CollectionUtils.isEmpty(tokenList)) {
 				String token = tokenList.get(0);
 				// 检查相关用户信息是否需要更新
-				UserInfo user = (UserInfo)tokenDao.getUserInfo(token);
+				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
 				if (!userInfo.equals(user)) {
 					tokenDao.updateUserInfo(token, userInfo);
 				}
@@ -103,7 +105,7 @@ public class TokenUtils {
 			try {
 				boolean check = tempUser.check(authUser);
 				if (!check) {
-					throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
+					throw new AuthException(TEMP_TOKEN_VALID_CODE, TEMP_TOKEN_VALID_MESSAGE);
 				}
 
 				// 一般来说,临时身份校验完毕,身份的权限可使用信息都会被消耗一部分,因此要及时更新
@@ -135,20 +137,33 @@ public class TokenUtils {
 
 	/**
 	 * 根据指定的token进行踢出用户
+	 *
 	 * @param token
 	 */
 	public static void kickOut(String token) {
 		if (StringUtils.isEmpty(token)) {
-			throw new AuthException(AuthConstant.KICK_OUT_TOKEN_EMPTY_CODE, AuthConstant.KICK_OUT_TOKEN_EMPTY_MESSAGE);
+			throw new AuthException(KICK_OUT_TOKEN_EMPTY_CODE, KICK_OUT_TOKEN_EMPTY_MESSAGE);
 		}
 		tokenDao.deleteUserInfo(token);
 	}
 
+	/**
+	 * 封锁时间为秒
+	 * @param lockTime
+	 */
+	public static void lock(long lockTime) {
+		if (lockTime < 0) {
+			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
+		}
+		UserInfo user = getUser();
+		user.setLock(true);
+		// 方便时间过期之后修改回正常未锁定的样子
+		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
+		tokenDao.updateUserInfo(getToken(), user);
+	}
+
 	public static Long getId() {
 		UserInfo user = getUser();
-		if (user == null) {
-			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
-		}
 		return user.getId();
 	}
 
@@ -169,7 +184,20 @@ public class TokenUtils {
 
 			};
 		}
-		return (UserInfo) tokenDao.getUserInfo(userKey);
+		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(userKey);
+		if (userInfo == null) {
+			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
+		}
+		if (userInfo.getLock()) {
+			long millis = System.currentTimeMillis();
+			if (millis < userInfo.getLockTime()) {
+				long lessTime = userInfo.getLockTime() - millis;
+				throw new AuthException(ACCOUNT_LOCK_CODE, ACCOUNT_LOCK_MESSAGE + TimeUtils.mill2Time(lessTime));
+			}
+			userInfo.setLock(false);
+			tokenDao.updateUserInfo(userKey, userInfo);
+		}
+		return userInfo;
 	}
 
 	public static String getToken() {
