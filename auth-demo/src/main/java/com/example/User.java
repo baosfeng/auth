@@ -6,6 +6,7 @@ public class User implements UserInfo {
 
 	private String mobilePhone;
 	private Long id;
+	private String[] auths;
 
 	public User() {
 	}
@@ -33,5 +34,15 @@ public class User implements UserInfo {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	@Override
+	public void setRoles(String... auths) {
+		this.auths = auths;
+	}
+
+	@Override
+	public String[] getRoles() {
+		return auths;
 	}
 }

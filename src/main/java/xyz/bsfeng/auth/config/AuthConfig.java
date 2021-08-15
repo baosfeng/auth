@@ -38,6 +38,8 @@ public class AuthConfig {
 	private String whiteUrlList = "";
 	/** token放行白名单 */
 	private String whiteTokenList = "";
+	/** 超级管理员的角色名称 */
+	private String adminRole = "administrator";
 
 	@NonNull
 	public String getTokenName() {
@@ -125,6 +127,14 @@ public class AuthConfig {
 		this.whiteTokenList = whiteTokenList;
 	}
 
+	public String getAdminRole() {
+		return adminRole;
+	}
+
+	public void setAdminRole(String adminRole) {
+		this.adminRole = adminRole;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -134,9 +144,11 @@ public class AuthConfig {
 				", readFrom='" + readFrom + '\'' +
 				", ignoreCamelCase=" + ignoreCamelCase +
 				", autoRenew=" + autoRenew +
+				", globalShare=" + globalShare +
 				", tokenType='" + tokenType + '\'' +
 				", whiteUrlList='" + whiteUrlList + '\'' +
 				", whiteTokenList='" + whiteTokenList + '\'' +
+				", adminRole='" + adminRole + '\'' +
 				'}';
 	}
 }

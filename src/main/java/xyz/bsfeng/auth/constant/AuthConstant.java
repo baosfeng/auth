@@ -22,6 +22,14 @@ public interface AuthConstant {
 	Integer TEMP_TOKEN_VALID_CODE = 403;
 	/** 临时token已过期 */
 	String TEMP_TOKEN_VALID_MESSAGE = "临时token已过期";
+	/** 当前账号没有访问改资源的权限 */
+	Integer ACCOUNT_NO_ROLE_CODE = 404;
+	/** 当前账号没有访问改资源的权限 */
+	String ACCOUNT_NO_ROLE_MESSAGE = "当前账号没有访问该资源的权限！";
+	/** 当前账号没有任何权限 */
+	Integer ACCOUNT_NO_ANY_ROLE_CODE = 405;
+	/** 当前账号没有任何权限 */
+	String ACCOUNT_NO_ANY_ROLE_MESSAGE = "当前账号没有任何权限！";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */

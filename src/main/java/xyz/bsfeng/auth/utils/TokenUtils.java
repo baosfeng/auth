@@ -49,7 +49,13 @@ public class TokenUtils {
 		List<String> tokenList = tokenDao.getTokenListById(userInfo.getId());
 		if (TokenManager.getConfig().getGlobalShare()) {
 			if (!CollectionUtils.isEmpty(tokenList)) {
-				return tokenList.get(0);
+				String token = tokenList.get(0);
+				// 检查相关用户信息是否需要更新
+				UserInfo user = (UserInfo)tokenDao.getUserInfo(token);
+				if (!userInfo.equals(user)) {
+					tokenDao.updateUserInfo(token, userInfo);
+				}
+				return token;
 			}
 		}
 		String token = getTokenKey();
@@ -133,6 +139,16 @@ public class TokenUtils {
 				@Override
 				public void setId(Long id) {
 
+				}
+
+				@Override
+				public void setRoles(String... auths) {
+
+				}
+
+				@Override
+				public String[] getRoles() {
+					return new String[]{TokenManager.getConfig().getAdminRole()};
 				}
 			};
 		}

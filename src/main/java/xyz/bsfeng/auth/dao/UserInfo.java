@@ -13,4 +13,12 @@ public interface UserInfo {
 	Long getId();
 
 	void setId(Long id);
+
+	default String[] getRoles() {
+		return new String[]{};
+	};
+
+	default void setRoles(String... auths) {
+
+	};
 }
