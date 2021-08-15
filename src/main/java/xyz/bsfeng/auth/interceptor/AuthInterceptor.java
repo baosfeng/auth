@@ -28,6 +28,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	private List<String> whiteTokenList;
 	private Boolean autoRenew;
 	private TokenDao tokenDao;
+	private Boolean enable;
 
 
 	public void init() {
@@ -39,11 +40,15 @@ public class AuthInterceptor implements HandlerInterceptor {
 		whiteUrlList.add("/error");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		autoRenew = authConfig.getAutoRenew();
+		enable = authConfig.getEnable();
 	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		log.info("正在访问{}", request.getRequestURI());
+		if (!enable) {
+			return true;
+		}
 		if (doWhiteUrl(request)) return true;
 		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		HasRole annotation = handlerMethod.getMethodAnnotation(HasRole.class);

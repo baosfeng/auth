@@ -10,7 +10,8 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 public class AuthConfig {
-
+	/** 是否启用验证 */
+	private Boolean enable = true;
 	/** token名称 */
 	@NonNull
 	private String tokenName = "token";
@@ -40,6 +41,14 @@ public class AuthConfig {
 	private String whiteTokenList = "";
 	/** 超级管理员的角色名称 */
 	private String adminRole = "administrator";
+
+	public Boolean getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
 
 	@NonNull
 	public String getTokenName() {
