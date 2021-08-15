@@ -167,15 +167,6 @@ public class TokenUtils {
 
 				}
 
-				@Override
-				public void setRoles(String... auths) {
-
-				}
-
-				@Override
-				public String[] getRoles() {
-					return new String[]{TokenManager.getConfig().getAdminRole()};
-				}
 			};
 		}
 		return (UserInfo) tokenDao.getUserInfo(userKey);
