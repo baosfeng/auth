@@ -78,6 +78,11 @@ public class TokenDaoDefaultImpl implements TokenDao {
 
 	}
 
+	@Override
+	public void deleteTokenListById(Long id) {
+
+	}
+
 
 	// --------------------- 定时清理过期数据  
 

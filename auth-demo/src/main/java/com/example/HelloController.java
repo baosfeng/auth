@@ -32,6 +32,12 @@ public class HelloController {
 		return id;
 	}
 
+	@GetMapping("/kickOut")
+	public String kickOut() {
+		TokenUtils.kickOut();
+		return "踢出成功";
+	}
+
 	@HasRole("all")
 	@GetMapping("/role/check")
 	public Long getRole() {

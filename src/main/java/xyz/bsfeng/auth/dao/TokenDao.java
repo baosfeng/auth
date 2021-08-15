@@ -87,4 +87,6 @@ public interface TokenDao {
 	 */
 	void setTokenListById(Long id, List<String> tokenList);
 
+	void deleteTokenListById(Long id);
+
 }

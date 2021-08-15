@@ -96,6 +96,12 @@ public class RedisTokenDaoImpl implements TokenDao {
 		redisTemplate.opsForValue().set(getTokenKey(id + ""), joinList, maxExpireTime, TimeUnit.SECONDS);
 	}
 
+	@Override
+	public void deleteTokenListById(Long id) {
+		String idKey = getTokenKey(id + "");
+		redisTemplate.delete(idKey);
+	}
+
 	private String getTokenKey(String key) {
 		if (key.startsWith(TOKEN_PREFIX)) {
 			return key;

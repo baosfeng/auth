@@ -30,6 +30,10 @@ public interface AuthConstant {
 	Integer ACCOUNT_NO_ANY_ROLE_CODE = 405;
 	/** 当前账号没有任何权限 */
 	String ACCOUNT_NO_ANY_ROLE_MESSAGE = "当前账号没有任何权限！";
+	/** 踢出的用户token不能为空 */
+	Integer KICK_OUT_TOKEN_EMPTY_CODE = 406;
+	/** 踢出的用户token不能为空 */
+	String KICK_OUT_TOKEN_EMPTY_MESSAGE = "踢出的用户token不能为空！";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */

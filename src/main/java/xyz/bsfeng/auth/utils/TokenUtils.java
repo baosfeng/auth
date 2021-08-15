@@ -114,8 +114,34 @@ public class TokenUtils {
 		}
 	}
 
+	/**
+	 * 默认退出的是当前账户的token
+	 */
 	public static void logout() {
-		tokenDao.deleteUserInfo(getToken());
+		kickOut(getToken());
+	}
+
+	/**
+	 * 踢出当前的所有登录，所有token全部失效
+	 */
+	public static void kickOut() {
+		Long id = getId();
+		List<String> tokenList = tokenDao.getTokenListById(id);
+		for (String token : tokenList) {
+			kickOut(token);
+		}
+		tokenDao.deleteTokenListById(id);
+	}
+
+	/**
+	 * 根据指定的token进行踢出用户
+	 * @param token
+	 */
+	public static void kickOut(String token) {
+		if (StringUtils.isEmpty(token)) {
+			throw new AuthException(AuthConstant.KICK_OUT_TOKEN_EMPTY_CODE, AuthConstant.KICK_OUT_TOKEN_EMPTY_MESSAGE);
+		}
+		tokenDao.deleteUserInfo(token);
 	}
 
 	public static Long getId() {
