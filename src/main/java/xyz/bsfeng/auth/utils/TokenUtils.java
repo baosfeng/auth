@@ -48,7 +48,11 @@ public class TokenUtils {
 	}
 
 	public static String login(UserInfo userInfo) {
-		List<String> tokenList = tokenDao.getTokenListById(userInfo.getId());
+		Long id = userInfo.getId();
+		if (id == null) {
+			throw new IllegalArgumentException("id不能为空");
+		}
+		List<String> tokenList = tokenDao.getTokenListById(id);
 		if (TokenManager.getConfig().getGlobalShare()) {
 			if (!CollectionUtils.isEmpty(tokenList)) {
 				String token = tokenList.get(0);
@@ -66,7 +70,7 @@ public class TokenUtils {
 			tokenList = new ArrayList<>();
 		}
 		tokenList.add(token);
-		tokenDao.setTokenListById(userInfo.getId(), tokenList);
+		tokenDao.setTokenListById(id, tokenList);
 		return token;
 	}
 
@@ -84,6 +88,9 @@ public class TokenUtils {
 	 */
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
 		Long id = getId();
+		if (id == null) {
+			throw new IllegalArgumentException("id不能为空");
+		}
 		authUser.setId(id);
 		String token;
 		if (StringUtils.isNotEmpty(field)) {
