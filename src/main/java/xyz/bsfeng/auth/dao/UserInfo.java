@@ -10,8 +10,6 @@ package xyz.bsfeng.auth.dao;
  */
 public abstract class UserInfo {
 
-	Boolean lock = false;
-	Long lockTime = 0L;
 	public abstract Long getId();
 
 	public abstract void setId(Long id);
@@ -23,18 +21,18 @@ public abstract class UserInfo {
 	public void setRoles(String... auths) {}
 
 	public Boolean getLock() {
-		return lock;
+		return false;
 	}
 
 	public void setLock(Boolean lock) {
-		this.lock = lock;
+
 	}
 
 	public Long getLockTime() {
-		return lockTime;
+		return System.nanoTime();
 	}
 
 	public void setLockTime(Long lockTime) {
-		this.lockTime = lockTime;
+
 	}
 }
