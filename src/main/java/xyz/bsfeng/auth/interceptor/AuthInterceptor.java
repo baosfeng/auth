@@ -3,6 +3,7 @@ package xyz.bsfeng.auth.interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.HasRole;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -11,12 +12,10 @@ import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.utils.TokenUtils;
-import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,10 +49,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 			return true;
 		}
 		if (doWhiteUrl(request)) return true;
-		HandlerMethod handlerMethod = (HandlerMethod) handler;
-		HasRole annotation = handlerMethod.getMethodAnnotation(HasRole.class);
-		if (annotation != null) {
-			checkPermission(annotation);
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			HasRole annotation = handlerMethod.getMethodAnnotation(HasRole.class);
+			if (annotation != null) {
+				checkPermission(annotation);
+			}
 		}
 
 		String token = TokenUtils.getToken();
