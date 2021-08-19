@@ -229,7 +229,7 @@ public class TokenUtils {
 			}
 		}
 		if (StringUtils.isEmpty(userKey)) {
-			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
+			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, TOKEN_EMPTY_MESSAGE);
 		}
 		return userKey;
 	}

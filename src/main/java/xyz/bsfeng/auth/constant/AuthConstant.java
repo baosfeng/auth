@@ -41,7 +41,11 @@ public interface AuthConstant {
 	/** 该账号已被封禁，解封时间还有 */
 	Integer ACCOUNT_LOCK_CODE = 408;
 	/** 该账号已被封禁，解封时间还有 */
-	String ACCOUNT_LOCK_MESSAGE = "该账号已被封禁，解封时间还有！";
+	String ACCOUNT_LOCK_MESSAGE = "该账号已被封禁，解封时间还有";
+	/** 该账号已被封禁，解封时间还有 */
+	Integer TOKEN_EMPTY_CODE = 409;
+	/** 该账号已被封禁，解封时间还有 */
+	String TOKEN_EMPTY_MESSAGE = "无法从请求体中获得token信息,请检查token名称是否正确";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */
