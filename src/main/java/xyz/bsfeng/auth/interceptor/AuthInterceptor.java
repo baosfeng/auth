@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class AuthInterceptor implements HandlerInterceptor {
 
 	private final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
-	private List<String> whiteUrlList;
 	private List<String> whiteTokenList;
 	private Boolean autoRenew;
 	private TokenDao tokenDao;
@@ -34,9 +33,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
 
-		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
-		whiteUrlList.add("/favicon.ico");
-		whiteUrlList.add("/error");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		autoRenew = authConfig.getAutoRenew();
 		enable = authConfig.getEnable();
@@ -48,7 +44,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (!enable) {
 			return true;
 		}
-		if (doWhiteUrl(request)) return true;
+		if (TokenUtils.checkWhiteUrl()) return true;
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
 			HasRole annotation = handlerMethod.getMethodAnnotation(HasRole.class);
@@ -94,22 +90,5 @@ public class AuthInterceptor implements HandlerInterceptor {
 		}
 		throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
 	}
-
-	private boolean doWhiteUrl(HttpServletRequest request) {
-		String uri = request.getRequestURI();
-		for (String white : whiteUrlList) {
-			if (white.endsWith("*")) {
-				white = white.replace("*", "");
-				if (uri.startsWith(white)) {
-					return true;
-				}
-			}
-			if (white.equalsIgnoreCase(uri)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 }

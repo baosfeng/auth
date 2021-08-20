@@ -13,6 +13,7 @@ import xyz.bsfeng.auth.exception.AuthException;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
@@ -24,11 +25,12 @@ public class TokenUtils {
 	private static String[] readFrom;
 	private static Boolean ignoreCamelCase;
 	private static List<String> whiteTokenList;
+	private static List<String> whiteUrlList;
 	private static long timeout;
 	private static String tokenType;
 	private static String tokenPrefix;
 
-	public TokenUtils() {
+	private TokenUtils() {
 	}
 
 	public static void init() {
@@ -45,6 +47,9 @@ public class TokenUtils {
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType().toLowerCase();
 		tokenPrefix = authConfig.getTokenPrefix();
+		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
+		whiteUrlList.add("/favicon.ico");
+		whiteUrlList.add("/error");
 	}
 
 	public static String login(UserInfo userInfo) {
@@ -269,6 +274,20 @@ public class TokenUtils {
 	 * @return 账户相关信息
 	 */
 	private static UserInfo getUserInfo() {
+		// 如果为白名单url, 返回-2
+		if (checkWhiteUrl()) {
+			return new UserInfo() {
+				@Override
+				public Long getId() {
+					return -2L;
+				}
+
+				@Override
+				public void setId(Long id) {
+
+				}
+			};
+		}
 		String userKey = getToken();
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
@@ -290,5 +309,22 @@ public class TokenUtils {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
 		return userInfo;
+	}
+
+	public static boolean checkWhiteUrl() {
+		HttpServletRequest request = SpringMVCUtil.getRequest();
+		String uri = request.getRequestURI();
+		for (String white : whiteUrlList) {
+			if (white.endsWith("*")) {
+				white = white.replace("*", "");
+				if (uri.startsWith(white)) {
+					return true;
+				}
+			}
+			if (white.equalsIgnoreCase(uri)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
