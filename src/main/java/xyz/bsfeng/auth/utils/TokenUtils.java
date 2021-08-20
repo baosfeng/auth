@@ -204,6 +204,7 @@ public class TokenUtils {
 				case AuthConstant.READ_FROM_HEADER:
 					if (!ignoreCamelCase) {
 						userKey = servletRequest.getHeader(tokenName);
+						break;
 					}
 					Enumeration<String> headerNames = servletRequest.getHeaderNames();
 					while (headerNames.hasMoreElements()) {
@@ -218,6 +219,7 @@ public class TokenUtils {
 				case AuthConstant.READ_FROM_URL:
 					if (!ignoreCamelCase) {
 						userKey = servletRequest.getParameter(tokenName);
+						break;
 					}
 					Enumeration<String> parameterNames = servletRequest.getParameterNames();
 					while (parameterNames.hasMoreElements()) {
