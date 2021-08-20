@@ -178,7 +178,6 @@ public class TokenUtils {
 	}
 
 	public static UserInfo getUser() {
-		String userKey = getToken();
 		UserInfo userInfo = getUserInfo();
 		if (userInfo.getLock()) {
 			long millis = System.currentTimeMillis();
@@ -187,6 +186,7 @@ public class TokenUtils {
 				throw new AuthException(ACCOUNT_LOCK_CODE, ACCOUNT_LOCK_MESSAGE + TimeUtils.mill2Time(lessTime));
 			}
 			userInfo.setLock(false);
+			String userKey = getToken();
 			tokenDao.updateUserInfo(userKey, userInfo);
 		}
 		return userInfo;
@@ -283,7 +283,6 @@ public class TokenUtils {
 				public Long getId() {
 					return -2L;
 				}
-
 				@Override
 				public void setId(Long id) {
 
