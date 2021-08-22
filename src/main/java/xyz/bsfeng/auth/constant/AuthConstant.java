@@ -25,7 +25,7 @@ public interface AuthConstant {
 	/** 当前账号没有访问改资源的权限 */
 	Integer ACCOUNT_NO_ROLE_CODE = 404;
 	/** 当前账号没有访问改资源的权限 */
-	String ACCOUNT_NO_ROLE_MESSAGE = "当前账号没有访问该资源的权限！";
+	String ACCOUNT_NO_ROLE_MESSAGE = "当前账号没有访问该资源的角色信息！";
 	/** 当前账号没有任何权限 */
 	Integer ACCOUNT_NO_ANY_ROLE_CODE = 405;
 	/** 当前账号没有任何权限 */
@@ -42,10 +42,14 @@ public interface AuthConstant {
 	Integer ACCOUNT_LOCK_CODE = 408;
 	/** 该账号已被封禁，解封时间还有 */
 	String ACCOUNT_LOCK_MESSAGE = "该账号已被封禁，解封时间还有";
-	/** 该账号已被封禁，解封时间还有 */
+	/** 无法从请求体中获得token信息 */
 	Integer TOKEN_EMPTY_CODE = 409;
-	/** 该账号已被封禁，解封时间还有 */
+	/** 无法从请求体中获得token信息 */
 	String TOKEN_EMPTY_MESSAGE = "无法从请求体中获得token信息,请检查token名称是否正确";
+	/** 当前账号没有访问该资源的权限 */
+	Integer ACCOUNT_NO_AUTH_CODE = 410;
+	/** 当前账号没有访问该资源的权限 */
+	String ACCOUNT_NO_AUTH_MESSAGE = "当前账号没有访问该资源的权限！";
 	/** md5方式生成token */
 	String TYPE_MD5 = "md5";
 	/** 随机16位字符方式生成token */

@@ -1,7 +1,7 @@
 package com.example;
 
 import xyz.bsfeng.auth.TokenManager;
-import xyz.bsfeng.auth.anno.HasRole;
+import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +44,7 @@ public class HelloController {
 		return "封禁成功";
 	}
 
-	@HasRole("all")
+	@PreAuthorize(hasRole = "all")
 	@GetMapping("/role/check")
 	public Long getRole() {
 		return TokenUtils.getId();

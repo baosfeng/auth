@@ -18,7 +18,15 @@ public abstract class UserInfo {
 		return new String[]{};
 	}
 
-	public void setRoles(String... auths) {}
+	public void setRoles(String... roles) {}
+
+	public String[] getAuths() {
+		return new String[]{};
+	}
+
+	public void setAtuhs(String... auths) {
+
+	}
 
 	public Boolean getLock() {
 		return false;

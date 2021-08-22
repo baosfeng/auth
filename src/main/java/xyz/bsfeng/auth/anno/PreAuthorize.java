@@ -8,11 +8,17 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface HasRole {
+public @interface PreAuthorize {
 
 	/**
-	 * 拥有的权限集合列表
+	 * 拥有的角色集合列表
 	 * @return
 	 */
-	String[] value() default "";
+	String[] hasRole() default "";
+
+	/**
+	 * 检查是否拥有对应的资源权限
+	 * @return
+	 */
+	String[] hasAuth() default "";
 }
