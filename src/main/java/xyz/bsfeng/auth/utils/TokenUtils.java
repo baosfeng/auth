@@ -3,16 +3,22 @@ package xyz.bsfeng.auth.utils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.anno.FieldSensitive;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.constant.SensitiveEnum;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
@@ -29,6 +35,7 @@ public class TokenUtils {
 	private static long timeout;
 	private static String tokenType;
 	private static String tokenPrefix;
+	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 
 	private TokenUtils() {
 	}
@@ -64,12 +71,14 @@ public class TokenUtils {
 				// 检查相关用户信息是否需要更新
 				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
 				if (!userInfo.equals(user)) {
+					processSensitive(userInfo);
 					tokenDao.updateUserInfo(token, userInfo);
 				}
 				return token;
 			}
 		}
 		String token = getTokenKey();
+		processSensitive(userInfo);
 		tokenDao.setUserInfo(token, userInfo, timeout);
 		if (tokenList == null) {
 			tokenList = new ArrayList<>();
@@ -283,6 +292,7 @@ public class TokenUtils {
 				public Long getId() {
 					return -2L;
 				}
+
 				@Override
 				public void setId(Long id) {
 
@@ -327,5 +337,55 @@ public class TokenUtils {
 			}
 		}
 		return false;
+	}
+
+	private static void processSensitive(UserInfo userInfo) {
+		List<Field> fieldList = FIELDS_MAP.get(userInfo.getClass());
+		if (CollectionUtils.isEmpty(fieldList)) {
+			HashSet<Field> fields = ReflectUtils.getFields(userInfo.getClass());
+			fieldList = fields.stream()
+					.filter(itm -> itm.getAnnotation(FieldSensitive.class) != null).collect(Collectors.toList());
+			FIELDS_MAP.put(userInfo.getClass(), fieldList);
+		}
+		if (CollectionUtils.isEmpty(fieldList)) {
+			return;
+		}
+		for (Field field : fieldList) {
+			String className = field.getType().getSimpleName();
+			if (!className.endsWith("String")) {
+				throw new RuntimeException(className + "类型不受支持");
+			}
+			field.setAccessible(true);
+			FieldSensitive annotation = field.getAnnotation(FieldSensitive.class);
+			SensitiveEnum sensitiveEnum = annotation.value();
+			try {
+				Method method = ReflectUtils.getMethodByField(userInfo.getClass(), field);
+				String value = (String) method.invoke(userInfo);
+				switch (sensitiveEnum) {
+					case PASSWORD:
+						field.set(userInfo, null);
+						break;
+					case ID_CARD:
+						String mixStr = StringUtils.mixStr(value.length() - 10);
+						value = value.substring(0, 6) + mixStr + value.substring(value.length() - 4);
+						field.set(userInfo, value);
+						break;
+					case EMAIL:
+						mixStr = StringUtils.mixStr(value.indexOf("@") - 4);
+						value = value.substring(0, 4) + mixStr + value.substring(value.indexOf("@"));
+						field.set(userInfo, value);
+						break;
+					case BANK_CARD:
+						mixStr = StringUtils.mixStr(value.length() - 8);
+						value = value.substring(0, 4) + mixStr + value.substring(value.length() - 4);
+						field.set(userInfo, value);
+						break;
+					default:
+						break;
+				}
+			} catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

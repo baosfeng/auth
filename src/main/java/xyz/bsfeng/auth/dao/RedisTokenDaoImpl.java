@@ -55,7 +55,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 			return;
 		}
 		long expireTime = getTimeout(tokenKey);
-		long maxTimeout = Math.max(expireTime, userInfo.getLockTime() - System.currentTimeMillis());
+		long maxTimeout = Math.max(expireTime, (userInfo.getLockTime() - System.currentTimeMillis()) / 1000);
 		if (0 < maxTimeout) {
 			redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
 		}

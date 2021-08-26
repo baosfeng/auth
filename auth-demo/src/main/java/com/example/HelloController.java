@@ -14,6 +14,7 @@ public class HelloController {
 		System.out.println(TokenManager.getConfig());
 		System.out.println(TokenManager.getTokenDao());
 		User user = new User(id);
+		user.setPassword("abc123");
 		user.setRoles("admin", "read", "write");
 		return TokenUtils.login(user);
 	}

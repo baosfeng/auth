@@ -27,4 +27,15 @@ public class StringUtils {
 		return builder.toString();
 	}
 
+	public static String mixStr(int length) {
+		if (length <= 0) {
+			return "";
+		}
+		StringBuilder builder = new StringBuilder(length);
+		while (length-- > 0) {
+			builder.append("*");
+		}
+		return builder.toString();
+	}
+
 }
