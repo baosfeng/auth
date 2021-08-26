@@ -24,7 +24,7 @@ public abstract class UserInfo {
 		return new String[]{};
 	}
 
-	public void setAtuhs(String... auths) {
+	public void setAuths(String... auths) {
 
 	}
 
