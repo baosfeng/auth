@@ -35,6 +35,7 @@ public class TokenUtils {
 	private static long timeout;
 	private static String tokenType;
 	private static String tokenPrefix;
+	private static Boolean checkWhiteUrlToken;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 
 	private TokenUtils() {
@@ -57,6 +58,7 @@ public class TokenUtils {
 		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
 		whiteUrlList.add("/favicon.ico");
 		whiteUrlList.add("/error");
+		checkWhiteUrlToken = authConfig.getCheckWhiteUrlToken();
 	}
 
 	public static String login(UserInfo userInfo) {
@@ -286,7 +288,8 @@ public class TokenUtils {
 	 */
 	private static UserInfo getUserInfo() {
 		// 如果为白名单url, 返回-2
-		if (checkWhiteUrl()) {
+		boolean isWhiteUrl = checkWhiteUrl();
+		if (isWhiteUrl && !checkWhiteUrlToken) {
 			return new UserInfo() {
 				@Override
 				public Long getId() {
@@ -298,6 +301,24 @@ public class TokenUtils {
 
 				}
 			};
+		}
+		// 当检测到白名单的token为空时，返回-2
+		if (isWhiteUrl) {
+			try {
+				getToken();
+			} catch (AuthException e) {
+				return new UserInfo() {
+					@Override
+					public Long getId() {
+						return -2L;
+					}
+
+					@Override
+					public void setId(Long id) {
+
+					}
+				};
+			}
 		}
 		String userKey = getToken();
 		// 如果为白名单token, 返回-1

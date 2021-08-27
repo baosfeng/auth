@@ -41,6 +41,8 @@ public class AuthConfig {
 	private String whiteTokenList = "";
 	/** 超级管理员的角色名称 */
 	private String adminRole = "administrator";
+	/** 是否检查白名单url的token信息 */
+	private Boolean checkWhiteUrlToken = false;
 
 	public Boolean getEnable() {
 		return enable;
@@ -144,10 +146,19 @@ public class AuthConfig {
 		this.adminRole = adminRole;
 	}
 
+	public Boolean getCheckWhiteUrlToken() {
+		return checkWhiteUrlToken;
+	}
+
+	public void setCheckWhiteUrlToken(Boolean checkWhiteUrlToken) {
+		this.checkWhiteUrlToken = checkWhiteUrlToken;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
-				"tokenName='" + tokenName + '\'' +
+				"enable=" + enable +
+				", tokenName='" + tokenName + '\'' +
 				", tokenPrefix='" + tokenPrefix + '\'' +
 				", timeout=" + timeout +
 				", readFrom='" + readFrom + '\'' +
@@ -158,6 +169,7 @@ public class AuthConfig {
 				", whiteUrlList='" + whiteUrlList + '\'' +
 				", whiteTokenList='" + whiteTokenList + '\'' +
 				", adminRole='" + adminRole + '\'' +
+				", checkWhiteUrlToken=" + checkWhiteUrlToken +
 				'}';
 	}
 }
