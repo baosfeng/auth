@@ -37,7 +37,7 @@ public abstract class UserInfo {
 	}
 
 	public Long getLockTime() {
-		return System.nanoTime();
+		return System.currentTimeMillis();
 	}
 
 	public void setLockTime(Long lockTime) {
