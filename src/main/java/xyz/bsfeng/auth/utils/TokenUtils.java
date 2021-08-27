@@ -27,7 +27,7 @@ public class TokenUtils {
 
 	private static TokenDao tokenDao;
 
-	private static String tokenName;
+	private static String[] tokenNames;
 	private static String[] readFrom;
 	private static Boolean ignoreCamelCase;
 	private static List<String> whiteTokenList;
@@ -45,11 +45,12 @@ public class TokenUtils {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
 
-		tokenName = authConfig.getTokenName();
+		String tokenName = authConfig.getTokenName();
 		ignoreCamelCase = authConfig.getIgnoreCamelCase();
 		if (ignoreCamelCase) {
 			tokenName = authConfig.getTokenName().replaceAll("-", "");
 		}
+		tokenNames = tokenName.split(",");
 		readFrom = authConfig.getReadFrom().split(",");
 		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		timeout = authConfig.getTimeout();
@@ -208,46 +209,56 @@ public class TokenUtils {
 		String userKey = "";
 		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
 		for (String from : readFrom) {
-			if (StringUtils.isNotEmpty(userKey)) {
-				break;
-			}
-			switch (from) {
-				case AuthConstant.READ_FROM_HEADER:
-					if (!ignoreCamelCase) {
-						userKey = servletRequest.getHeader(tokenName);
-						break;
-					}
-					Enumeration<String> headerNames = servletRequest.getHeaderNames();
-					while (headerNames.hasMoreElements()) {
-						String originHeader = headerNames.nextElement();
-						String element = originHeader.replaceAll("-", "").trim();
-						if (element.equalsIgnoreCase(tokenName)) {
-							userKey = servletRequest.getHeader(originHeader);
-							break;
-						}
-					}
+			for (String tokenName : tokenNames) {
+				if (StringUtils.isNotEmpty(userKey)) {
 					break;
-				case AuthConstant.READ_FROM_URL:
-					if (!ignoreCamelCase) {
-						userKey = servletRequest.getParameter(tokenName);
+				}
+				switch (from) {
+					case AuthConstant.READ_FROM_HEADER:
+						userKey = doReadFromHeader(userKey, servletRequest, tokenName);
 						break;
-					}
-					Enumeration<String> parameterNames = servletRequest.getParameterNames();
-					while (parameterNames.hasMoreElements()) {
-						String originParam = parameterNames.nextElement();
-						String element = originParam.replaceAll("-", "").trim();
-						if (element.equalsIgnoreCase(tokenName)) {
-							userKey = servletRequest.getParameter(originParam);
-							break;
-						}
-					}
-					break;
-				default:
-					throw new AuthException(AuthConstant.TYPE_NOT_SUPPORT_CODE, AuthConstant.TYPE_NOT_SUPPORT_MESSAGE);
+					case AuthConstant.READ_FROM_URL:
+						userKey = doReadFromUrl(userKey, servletRequest, tokenName);
+						break;
+					default:
+						throw new AuthException(AuthConstant.TYPE_NOT_SUPPORT_CODE, AuthConstant.TYPE_NOT_SUPPORT_MESSAGE);
+				}
 			}
 		}
 		if (StringUtils.isEmpty(userKey)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, TOKEN_EMPTY_MESSAGE);
+		}
+		return userKey;
+	}
+
+	private static String doReadFromUrl(String userKey, HttpServletRequest servletRequest, String tokenName) {
+		if (!ignoreCamelCase) {
+			return servletRequest.getParameter(tokenName);
+		}
+		Enumeration<String> parameterNames = servletRequest.getParameterNames();
+		while (parameterNames.hasMoreElements()) {
+			String originParam = parameterNames.nextElement();
+			String element = originParam.replaceAll("-", "").trim();
+			if (element.equalsIgnoreCase(tokenName)) {
+				userKey = servletRequest.getParameter(originParam);
+				break;
+			}
+		}
+		return userKey;
+	}
+
+	private static String doReadFromHeader(String userKey, HttpServletRequest servletRequest, String tokenName) {
+		if (!ignoreCamelCase) {
+			return servletRequest.getHeader(tokenName);
+		}
+		Enumeration<String> headerNames = servletRequest.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String originHeader = headerNames.nextElement();
+			String element = originHeader.replaceAll("-", "").trim();
+			if (element.equalsIgnoreCase(tokenName)) {
+				userKey = servletRequest.getHeader(originHeader);
+				break;
+			}
 		}
 		return userKey;
 	}

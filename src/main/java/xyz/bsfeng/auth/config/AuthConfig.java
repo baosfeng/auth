@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 public class AuthConfig {
 	/** 是否启用验证 */
 	private Boolean enable = true;
-	/** token名称 */
+	/** token名称,如果使用逗号进行分割，表示可从多种方式读取 */
 	@NonNull
 	private String tokenName = "token";
 	/** token名称保存的前缀 */
