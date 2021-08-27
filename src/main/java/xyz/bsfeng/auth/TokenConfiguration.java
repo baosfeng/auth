@@ -45,7 +45,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 		redisTemplate.setValueSerializer(valueSerializer);
 		redisTemplate.setHashValueSerializer(valueSerializer);
 		redisTemplate.afterPropertiesSet();
-		return new RedisTokenDaoImpl(redisTemplate);
+		return new RedisTokenDaoImpl(redisTemplate, authConfig());
 	}
 
 

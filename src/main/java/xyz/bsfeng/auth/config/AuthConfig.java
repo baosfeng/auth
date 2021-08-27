@@ -43,6 +43,8 @@ public class AuthConfig {
 	private String adminRole = "administrator";
 	/** 是否检查白名单url的token信息 */
 	private Boolean checkWhiteUrlToken = false;
+	/** 用于实现多种业务平台，多个业务平台使用不同的认证 */
+	private String loginType = "login";
 
 	public Boolean getEnable() {
 		return enable;
@@ -154,6 +156,14 @@ public class AuthConfig {
 		this.checkWhiteUrlToken = checkWhiteUrlToken;
 	}
 
+	public String getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(String loginType) {
+		this.loginType = loginType;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -170,6 +180,7 @@ public class AuthConfig {
 				", whiteTokenList='" + whiteTokenList + '\'' +
 				", adminRole='" + adminRole + '\'' +
 				", checkWhiteUrlToken=" + checkWhiteUrlToken +
+				", loginType='" + loginType + '\'' +
 				'}';
 	}
 }

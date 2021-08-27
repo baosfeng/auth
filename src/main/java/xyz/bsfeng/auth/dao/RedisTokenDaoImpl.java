@@ -19,12 +19,15 @@ import java.util.stream.Collectors;
 public class RedisTokenDaoImpl implements TokenDao {
 
 	private final RedisTemplate<String, Object> redisTemplate;
-	public RedisTokenDaoImpl(RedisTemplate<String, Object> redisTemplate) {
+	private static String TOKEN_PREFIX = "user:";
+	public RedisTokenDaoImpl(RedisTemplate<String, Object> redisTemplate, AuthConfig authConfig) {
 		this.redisTemplate = redisTemplate;
+		String loginType = authConfig.getLoginType();
+		if (!loginType.endsWith(":")) {
+			loginType += ":";
+		}
+		TOKEN_PREFIX += loginType;
 	}
-
-	private static final String TOKEN_PREFIX = "user:login:";
-
 
 	@Override
 	public Object getUserInfo(String key) {
