@@ -104,11 +104,10 @@ public class TokenUtils {
 	 * @return 登录token
 	 */
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
-		Long id = getId();
+		Long id = authUser.getId();
 		if (id == null) {
-			throw new IllegalArgumentException("id不能为空");
+			authUser.setId(-2L);
 		}
-		authUser.setId(id);
 		String token;
 		if (StringUtils.isNotEmpty(field)) {
 			token = DigestUtils.md5DigestAsHex(field.getBytes(StandardCharsets.UTF_8));
