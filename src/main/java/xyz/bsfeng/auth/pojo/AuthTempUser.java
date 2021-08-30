@@ -12,7 +12,7 @@ public class AuthTempUser extends TempUser {
 
 	private String[] roles;
 	private String[] auths;
-	private Boolean lock;
+	private Boolean lock = false;
 	private Long lockTime = System.currentTimeMillis();
 
 	public AuthTempUser(Long id) {

@@ -13,7 +13,7 @@ public class AuthUser extends UserInfo {
 	private Long id;
 	private String[] roles;
 	private String[] auths;
-	private Boolean lock;
+	private Boolean lock = false;
 	private Long lockTime = System.currentTimeMillis();
 
 	public AuthUser() {

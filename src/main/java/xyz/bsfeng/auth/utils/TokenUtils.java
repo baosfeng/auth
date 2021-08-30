@@ -190,7 +190,7 @@ public class TokenUtils {
 
 	public static UserInfo getUser() {
 		UserInfo userInfo = getUserInfo();
-		if (userInfo.getLock()) {
+		if (userInfo.getLock() != null && userInfo.getLock()) {
 			long millis = System.currentTimeMillis();
 			if (millis < userInfo.getLockTime()) {
 				long lessTime = userInfo.getLockTime() - millis;
