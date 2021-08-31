@@ -113,6 +113,8 @@ public class TokenUtils {
 			token = DigestUtils.md5DigestAsHex(field.getBytes(StandardCharsets.UTF_8));
 		} else {
 			token = getTokenKey();
+			token = token.replace(tokenPrefix, "");
+			token = tokenPrefix + TEMP_PREFIX + token;
 		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		return token;

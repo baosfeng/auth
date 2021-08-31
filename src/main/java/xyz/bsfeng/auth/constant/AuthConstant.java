@@ -64,4 +64,6 @@ public interface AuthConstant {
 	String TYPE_RANDOM64 = "random64";
 	/** uuid方式生成token */
 	String TYPE_UUID = "uuid";
+	/** 临时token的前缀 */
+	String TEMP_PREFIX = "aBYY";
 }

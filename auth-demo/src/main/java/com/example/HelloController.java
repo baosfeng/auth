@@ -2,6 +2,7 @@ package com.example;
 
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.PreAuthorize;
+import xyz.bsfeng.auth.pojo.AuthTempUser;
 import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,8 +54,8 @@ public class HelloController {
 
 	@GetMapping("/temp")
 	public String tempLogin() {
-		UserTemp userTemp = new UserTemp();
-		return TokenUtils.loginTemp(userTemp, 100L);
+		AuthTempUser authTempUser = new AuthTempUser(1L);
+		return TokenUtils.loginTemp(authTempUser, 100L);
 	}
 
 	@GetMapping("/logout")

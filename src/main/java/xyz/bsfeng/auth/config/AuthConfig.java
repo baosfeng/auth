@@ -45,6 +45,8 @@ public class AuthConfig {
 	private Boolean checkWhiteUrlToken = false;
 	/** 用于实现多种业务平台，多个业务平台使用不同的认证 */
 	private String loginType = "login";
+	/** 临时身份登录后缀 */
+	private String tempSuffix = "temp";
 
 	public Boolean getEnable() {
 		return enable;
@@ -164,6 +166,14 @@ public class AuthConfig {
 		this.loginType = loginType;
 	}
 
+	public String getTempSuffix() {
+		return tempSuffix;
+	}
+
+	public void setTempSuffix(String tempSuffix) {
+		this.tempSuffix = tempSuffix;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -181,6 +191,7 @@ public class AuthConfig {
 				", adminRole='" + adminRole + '\'' +
 				", checkWhiteUrlToken=" + checkWhiteUrlToken +
 				", loginType='" + loginType + '\'' +
+				", tempSuffix='" + tempSuffix + '\'' +
 				'}';
 	}
 }

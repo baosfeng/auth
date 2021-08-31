@@ -1,5 +1,5 @@
 auth:
-  white-url-list: /login
+  white-url-list: /login,/temp
   token-name: token
   token-prefix: every
   read-from: url

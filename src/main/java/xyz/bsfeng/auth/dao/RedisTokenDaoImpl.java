@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.SerializationException;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
 
 import java.util.Arrays;
@@ -25,6 +26,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private static String TOKEN_PREFIX = "user:";
+	private static String TEMP_TOKEN_SUFFIX = ":";
+	private static String tokenPrefix;
+
 	public RedisTokenDaoImpl(RedisTemplate<String, Object> redisTemplate, AuthConfig authConfig) {
 		this.redisTemplate = redisTemplate;
 		String loginType = authConfig.getLoginType();
@@ -32,6 +36,8 @@ public class RedisTokenDaoImpl implements TokenDao {
 			loginType += ":";
 		}
 		TOKEN_PREFIX += loginType;
+		TEMP_TOKEN_SUFFIX = authConfig.getTempSuffix() + TEMP_TOKEN_SUFFIX;
+		tokenPrefix = authConfig.getTokenPrefix();
 	}
 
 	@Override
@@ -117,6 +123,9 @@ public class RedisTokenDaoImpl implements TokenDao {
 	private String getTokenKey(String key) {
 		if (key.startsWith(TOKEN_PREFIX)) {
 			return key;
+		}
+		if (key.startsWith(tokenPrefix + AuthConstant.TEMP_PREFIX)) {
+			return TOKEN_PREFIX + TEMP_TOKEN_SUFFIX + key;
 		}
 		return TOKEN_PREFIX + key;
 	}
