@@ -51,6 +51,13 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Override
 	public void setUserInfo(String key, UserInfo userInfo, long timeout) {
+		if (timeout == -1) {
+			redisTemplate.opsForValue().set(getTokenKey(key), userInfo);
+			return;
+		}
+		if (timeout <= 0) {
+			return;
+		}
 		redisTemplate.opsForValue().set(getTokenKey(key), userInfo, timeout, TimeUnit.SECONDS);
 	}
 
