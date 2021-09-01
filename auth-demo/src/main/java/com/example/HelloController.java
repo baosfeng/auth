@@ -42,7 +42,7 @@ public class HelloController {
 
 	@GetMapping("/lock")
 	public String lock() {
-		TokenUtils.lock(100L);
+		TokenUtils.lock(TokenUtils.getId(), 100L);
 		return "封禁成功";
 	}
 

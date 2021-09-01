@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.utils;
 
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.FieldSensitive;
@@ -73,11 +72,22 @@ public class TokenUtils {
 				String token = tokenList.get(0);
 				// 检查相关用户信息是否需要更新
 				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
+				if (user.getLock()) {
+					throw new AuthException(412, "账户已被封禁!");
+				}
 				if (!userInfo.equals(user)) {
 					processSensitive(userInfo);
 					tokenDao.updateUserInfo(token, userInfo);
 				}
 				return token;
+			}
+		}
+		if (!CollectionUtils.isEmpty(tokenList)) {
+			for (String token : tokenList) {
+				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
+				if (user.getLock()) {
+					throw new AuthException(412, "账户已被封禁!");
+				}
 			}
 		}
 		String token = getTokenKey();
@@ -139,14 +149,14 @@ public class TokenUtils {
 	}
 
 	/**
-	 * 默认退出的是当前账户的token
+	 * 默认退出的是当前账户的token,注意账户被封禁无法正常退出
 	 */
 	public static void logout() {
 		kickOut(getToken());
 	}
 
 	/**
-	 * 踢出当前的所有登录，所有token全部失效
+	 * 踢出当前的所有登录，所有token全部失效,注意账户被封禁无法正常退出
 	 */
 	public static void kickOut() {
 		Long id = getId();
@@ -170,19 +180,34 @@ public class TokenUtils {
 	}
 
 	/**
-	 * 封锁时间为秒
+	 * 封禁指定id的用户,且封禁所有token
 	 *
-	 * @param lockTime 封禁的时间
+	 * @param id 用户id
+	 * @param lockTime 封禁时间
 	 */
-	public static void lock(long lockTime) {
+	public static void lock(long id, long lockTime) {
+		List<String> tokenList = tokenDao.getTokenListById(id);
+		if (CollectionUtils.isNotEmpty(tokenList)) {
+			for (String token : tokenList) {
+				lock(token, lockTime);
+			}
+		}
+	}
+
+	/**
+	 * 根据指定的token进行封禁
+	 *
+	 * @param token 用户token
+	 * @param lockTime 封禁时间
+	 */
+	public static void lock(String token, long lockTime) {
 		if (lockTime < 0) {
 			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
 		}
-		UserInfo user = getUserInfo();
+		UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
 		user.setLock(true);
-		// 方便时间过期之后修改回正常未锁定的样子
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
-		tokenDao.updateUserInfo(getToken(), user);
+		tokenDao.updateUserInfo(token, user);
 	}
 
 	public static Long getId() {
