@@ -2,6 +2,7 @@ package xyz.bsfeng.auth;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -96,6 +97,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 
 	@Bean("authThreadPool")
 	@Qualifier("authThreadPool")
+	@ConditionalOnMissingBean(ThreadPoolExecutor.class)
 	public ThreadPoolExecutor authThreadPool() {
 		return new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),
 				Runtime.getRuntime().availableProcessors(),
