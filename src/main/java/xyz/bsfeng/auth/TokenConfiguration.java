@@ -96,7 +96,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 
 	@Bean("authThreadPool")
 	@Qualifier("authThreadPool")
-	public ThreadPoolExecutor threadPool() {
+	public ThreadPoolExecutor authThreadPool() {
 		return new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),
 				Runtime.getRuntime().availableProcessors(),
 				0L, TimeUnit.MILLISECONDS,
