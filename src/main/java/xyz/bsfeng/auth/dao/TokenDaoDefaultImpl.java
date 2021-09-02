@@ -1,7 +1,6 @@
 package xyz.bsfeng.auth.dao;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,13 +68,18 @@ public class TokenDaoDefaultImpl implements TokenDao {
 	}
 
 	@Override
-	public List<String> getTokenListById(Long id) {
+	public Map<String, UserModel> getTokenInfoMapById(Long id) {
 		return null;
 	}
 
 	@Override
-	public void setTokenListById(Long id, List<String> tokenList) {
+	public void setTokenInfoMapById(Long id, Map<String, UserModel> tokenMap) {
 
+	}
+
+	@Override
+	public UserModel getTokenInfoByToken(Long id, String token) {
+		return null;
 	}
 
 	@Override

@@ -22,6 +22,12 @@ import xyz.bsfeng.auth.interceptor.AuthInterceptor;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.SpringUtils;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author bsfeng
  * @date 2021/8/7-10:02
@@ -85,6 +91,27 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	@Bean
 	public AuthExceptionHandler authExceptionHandler() {
 		return new AuthExceptionHandler();
+	}
+
+	@Bean("authThreadPool")
+	public ThreadPoolExecutor threadPool() {
+		return new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),
+				Runtime.getRuntime().availableProcessors(),
+				0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>(),
+				threadFactory());
+	}
+
+	public ThreadFactory threadFactory() {
+		return new ThreadFactory() {
+			private final AtomicInteger atomicInteger = new AtomicInteger();
+
+			@Override
+			public Thread newThread(Runnable r) {
+				String threadName = "auth_" + atomicInteger.getAndIncrement() + "";
+				return new Thread(null, r, threadName, 0);
+			}
+		};
 	}
 
 }

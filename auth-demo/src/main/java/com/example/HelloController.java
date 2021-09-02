@@ -1,23 +1,28 @@
 package com.example;
 
-import xyz.bsfeng.auth.TokenManager;
-import xyz.bsfeng.auth.anno.PreAuthorize;
-import xyz.bsfeng.auth.pojo.AuthTempUser;
-import xyz.bsfeng.auth.utils.TokenUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.bsfeng.auth.anno.PreAuthorize;
+import xyz.bsfeng.auth.pojo.AuthLoginModel;
+import xyz.bsfeng.auth.pojo.AuthTempUser;
+import xyz.bsfeng.auth.pojo.AuthUser;
+import xyz.bsfeng.auth.utils.TokenUtils;
 
 @RestController
 public class HelloController {
 
 	@GetMapping("/login")
 	public String login(Long id) {
-		System.out.println(TokenManager.getConfig());
-		System.out.println(TokenManager.getTokenDao());
 		User user = new User(id);
 		user.setPassword("abc123");
 		user.setRoles("admin", "read", "write");
 		return TokenUtils.login(user);
+	}
+
+	@GetMapping("/login/device")
+	public String loginDevice(Long id) {
+		AuthUser authUser = new AuthUser(id);
+		return TokenUtils.login(authUser, new AuthLoginModel().setDevice("pc"));
 	}
 
 	@GetMapping("/info")
@@ -55,7 +60,7 @@ public class HelloController {
 	@GetMapping("/temp")
 	public String tempLogin() {
 		AuthTempUser authTempUser = new AuthTempUser(1L);
-		return TokenUtils.loginTemp(authTempUser, 100L);
+		return TokenUtils.loginTemp(authTempUser, 5L);
 	}
 
 	@GetMapping("/logout")

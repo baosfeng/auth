@@ -2,7 +2,8 @@ auth:
   white-url-list: /login,/temp,/login*
   token-name: token
   token-prefix: every
-  globalShare: true
+  globalShare: false
+  allow-sample-device-login: false
 server:
   port: 8080
 spring:

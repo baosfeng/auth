@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.FieldSensitive;
@@ -9,7 +11,10 @@ import xyz.bsfeng.auth.constant.SensitiveEnum;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
+import xyz.bsfeng.auth.dao.UserModel;
 import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.pojo.AuthLoginModel;
+import xyz.bsfeng.auth.pojo.AuthUser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
@@ -24,6 +29,8 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
 public class TokenUtils {
 
+	private static final Logger log = LoggerFactory.getLogger(TokenUtils.class);
+
 	private static TokenDao tokenDao;
 
 	private static String[] tokenNames;
@@ -35,6 +42,8 @@ public class TokenUtils {
 	private static String tokenType;
 	private static String tokenPrefix;
 	private static Boolean checkWhiteUrlToken;
+	private static Boolean allowSampleDevice;
+	private static final Long ONE_DAY = 24 * 60 * 60 * 1000L;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 
 	private TokenUtils() {
@@ -59,31 +68,33 @@ public class TokenUtils {
 		whiteUrlList.add("/favicon.ico");
 		whiteUrlList.add("/error");
 		checkWhiteUrlToken = authConfig.getCheckWhiteUrlToken();
+		allowSampleDevice = authConfig.getAllowSampleDeviceLogin();
 	}
 
 	public static String login(UserInfo userInfo) {
+		return login(userInfo, null);
+	}
+
+	/**
+	 * 此方法用于实现多端登录,注意,如果使用了全局共享token,那么将不会派上用场,返回仍旧为原始token
+	 *
+	 * @param userInfo   待登录的用户信息
+	 * @param loginModel 用户的额外配置信息
+	 * @return 登录token
+	 */
+	public static String login(UserInfo userInfo, AuthLoginModel loginModel) {
 		Long id = userInfo.getId();
 		if (id == null) {
 			throw new IllegalArgumentException("id不能为空");
 		}
-		List<String> tokenList = tokenDao.getTokenListById(id);
-		if (TokenManager.getConfig().getGlobalShare()) {
-			if (!CollectionUtils.isEmpty(tokenList)) {
-				String token = tokenList.get(0);
-				// 检查相关用户信息是否需要更新
-				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
-				if (user.getLock()) {
-					throw new AuthException(412, "账户已被封禁!");
-				}
-				if (!userInfo.equals(user)) {
-					processSensitive(userInfo);
-					tokenDao.updateUserInfo(token, userInfo);
-				}
-				return token;
-			}
+		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
+		// 处理全局共享token
+		if (TokenManager.getConfig().getGlobalShare() && CollectionUtils.isNotEmpty(tokenInfoMap)) {
+			return processGlobalShare(userInfo, tokenInfoMap);
 		}
-		if (!CollectionUtils.isEmpty(tokenList)) {
-			for (String token : tokenList) {
+		if (CollectionUtils.isNotEmpty(tokenInfoMap)) {
+			// 处理账号封禁情况
+			for (String token : tokenInfoMap.keySet()) {
 				UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
 				if (user.getLock()) {
 					throw new AuthException(412, "账户已被封禁!");
@@ -93,11 +104,25 @@ public class TokenUtils {
 		String token = getTokenKey();
 		processSensitive(userInfo);
 		tokenDao.setUserInfo(token, userInfo, timeout);
-		if (tokenList == null) {
-			tokenList = new ArrayList<>();
+		if (CollectionUtils.isEmpty(tokenInfoMap)) {
+			tokenInfoMap = new HashMap<>(4);
 		}
-		tokenList.add(token);
-		tokenDao.setTokenListById(id, tokenList);
+		// 设置是否允许多端登录
+		if (!allowSampleDevice && loginModel != null) {
+			// 设置被挤下线的用户相关信息
+			Iterator<UserModel> iterator = tokenInfoMap.values().stream()
+					.filter(itm -> itm.getDevice().equals(loginModel.getDevice())).iterator();
+			while (iterator.hasNext()) {
+				UserModel userModel = iterator.next();
+				userModel.setToken(token);
+				userModel.setOfflineTime(System.currentTimeMillis());
+			}
+		}
+		UserModel userModel = new UserModel()
+				.setDevice(loginModel == null ? null : loginModel.getDevice())
+				.setExpireTime(System.currentTimeMillis() + ONE_DAY);
+		tokenInfoMap.put(token, userModel);
+		tokenDao.setTokenInfoMapById(id, tokenInfoMap);
 		return token;
 	}
 
@@ -160,8 +185,8 @@ public class TokenUtils {
 	 */
 	public static void kickOut() {
 		Long id = getId();
-		List<String> tokenList = tokenDao.getTokenListById(id);
-		for (String token : tokenList) {
+		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
+		for (String token : tokenInfoMap.keySet()) {
 			kickOut(token);
 		}
 		tokenDao.deleteTokenListById(id);
@@ -176,17 +201,43 @@ public class TokenUtils {
 		if (StringUtils.isEmpty(token)) {
 			throw new AuthException(KICK_OUT_TOKEN_EMPTY_CODE, KICK_OUT_TOKEN_EMPTY_MESSAGE);
 		}
+		// 更新用户拥有的token集合
+		Object userInfo = tokenDao.getUserInfo(token);
+		if (userInfo == null) {
+			log.warn("用户已退出登录");
+			return;
+		}
+		UserInfo user = (UserInfo) userInfo;
+		Long id = user.getId();
+		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
+		if (CollectionUtils.isNotEmpty(tokenInfoMap)) {
+			tokenInfoMap.remove(token);
+			// 如果删除之后仅剩一个,那么删除
+			if (CollectionUtils.isEmpty(tokenInfoMap)) {
+				tokenDao.deleteTokenListById(id);
+			}
+		}
 		tokenDao.deleteUserInfo(token);
 	}
 
 	/**
 	 * 封禁指定id的用户,且封禁所有token
 	 *
-	 * @param id 用户id
+	 * @param id       用户id
 	 * @param lockTime 封禁时间
 	 */
 	public static void lock(long id, long lockTime) {
-		List<String> tokenList = tokenDao.getTokenListById(id);
+		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
+		if (CollectionUtils.isEmpty(tokenInfoMap)) {
+			// 未登录的用户将自动帮他进行登录
+			if (TokenManager.getConfig().getKickOutIgnoreLogin()) {
+				AuthUser authUser = new AuthUser(id);
+				login(authUser, new AuthLoginModel().setTimeout(lockTime * 1000));
+				lock(id, lockTime);
+				return;
+			}
+		}
+		Set<String> tokenList = tokenInfoMap.keySet();
 		if (CollectionUtils.isNotEmpty(tokenList)) {
 			for (String token : tokenList) {
 				lock(token, lockTime);
@@ -197,7 +248,7 @@ public class TokenUtils {
 	/**
 	 * 根据指定的token进行封禁
 	 *
-	 * @param token 用户token
+	 * @param token    用户token
 	 * @param lockTime 封禁时间
 	 */
 	public static void lock(String token, long lockTime) {
@@ -205,6 +256,10 @@ public class TokenUtils {
 			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
 		}
 		UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
+		if (user == null) {
+			log.warn("待封禁的token已过期");
+			return;
+		}
 		user.setLock(true);
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
 		tokenDao.updateUserInfo(token, user);
@@ -377,6 +432,10 @@ public class TokenUtils {
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
+		UserModel userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), userKey);
+		if (userModel.getOfflineTime() != null) {
+			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
+		}
 		return userInfo;
 	}
 
@@ -445,5 +504,23 @@ public class TokenUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static String processGlobalShare(UserInfo userInfo, Map<String, UserModel> tokenInfoMap) {
+		Iterator<String> iterator = tokenInfoMap.keySet().iterator();
+		String token = iterator.next();
+		// 检查相关用户信息是否需要更新
+		UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
+		if (BooleanUtils.isTrue(user.getLock())) {
+			throw new AuthException(412, "账户已被封禁!");
+		}
+		if (!userInfo.equals(user)) {
+			processSensitive(userInfo);
+			tokenDao.updateUserInfo(token, userInfo);
+		}
+		long currentTime = System.currentTimeMillis();
+		tokenInfoMap.forEach((key, value) -> value.setExpireTime(currentTime + ONE_DAY));
+		tokenDao.setTokenInfoMapById(user.getId(), tokenInfoMap);
+		return token;
 	}
 }

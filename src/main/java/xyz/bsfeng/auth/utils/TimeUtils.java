@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.utils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +14,7 @@ import java.util.Date;
 public class TimeUtils {
 
 	private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH时mm分ss秒");
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	/**
 	 * 将毫秒转换为指定的时间
@@ -36,6 +38,11 @@ public class TimeUtils {
 			return days + "天" + format;
 		}
 		return year + "年" + days + "天" + format;
+	}
+
+	public static String longToTime(Long time) {
+		Instant instant = Instant.ofEpochMilli(time);
+		return DATE_TIME_FORMATTER.format(instant.atOffset(ZoneOffset.ofHours(0)).toLocalDateTime());
 	}
 
 }

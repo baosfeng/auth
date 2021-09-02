@@ -59,4 +59,34 @@ public class User extends UserInfo {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	@Override
+	public String[] getAuths() {
+		return auths;
+	}
+
+	@Override
+	public void setAuths(String[] auths) {
+		this.auths = auths;
+	}
+
+	@Override
+	public Long getLockTime() {
+		return lockTime;
+	}
+
+	@Override
+	public void setLockTime(Long lockTime) {
+		this.lockTime = lockTime;
+	}
+
+	@Override
+	public Boolean getLock() {
+		return lock;
+	}
+
+	@Override
+	public void setLock(Boolean lock) {
+		this.lock = lock;
+	}
 }

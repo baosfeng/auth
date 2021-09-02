@@ -8,11 +8,9 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.OBJECT_SERIALIZER_CODE;
 import static xyz.bsfeng.auth.constant.AuthConstant.OBJECT_SERIALIZER_MESSAGE;
@@ -74,16 +72,24 @@ public class RedisTokenDaoImpl implements TokenDao {
 		}
 		// 防止出现封禁时间小于key过期时间
 		AuthConfig authConfig = TokenManager.getConfig();
-		long lockTime = (userInfo.getLockTime() - System.currentTimeMillis()) / 1000;
+		long lockTime = (userInfo.getLockTime() == null ? 0 : userInfo.getLockTime() - System.currentTimeMillis()) / 1000;
+		// 配置自动刷新key有效时间
 		if (authConfig.getAutoRenew()) {
 			long maxTimeout = Math.max(authConfig.getTimeout(), lockTime);
 			setUserInfo(tokenKey, userInfo, maxTimeout);
+			// 更新用户拥有的token配置信息
+			String idKey = getTokenKey(userInfo.getId() + "");
+			redisTemplate.expire(idKey, maxTimeout, TimeUnit.SECONDS);
 			return;
 		}
+		// 不自动刷新key的有效时间,选择有效时间和封禁时间中最大的一个
 		long expireTime = getTimeout(tokenKey);
 		long maxTimeout = Math.max(expireTime, lockTime);
 		if (0 < maxTimeout) {
 			redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
+			// 更新用户拥有的token配置信息
+			String idKey = getTokenKey(userInfo.getId() + "");
+			redisTemplate.expire(idKey, maxTimeout, TimeUnit.SECONDS);
 		}
 	}
 
@@ -104,21 +110,42 @@ public class RedisTokenDaoImpl implements TokenDao {
 	}
 
 	@Override
-	public List<String> getTokenListById(Long id) {
+	public Map<String, UserModel> getTokenInfoMapById(Long id) {
 		// 一个id对应多个token
 		String idKey = getTokenKey(id + "");
-		Object o = redisTemplate.opsForValue().get(idKey);
-		if (o == null) {
-			return null;
+		Map<Object, Object> entries = redisTemplate.opsForHash().entries(idKey);
+		Map<String, UserModel> newMap = new HashMap<>();
+		long currentTime = System.currentTimeMillis();
+		// 删除过期的key
+		for (Map.Entry<Object, Object> entry : entries.entrySet()) {
+			UserModel userModel = (UserModel) entry.getValue();
+			if (currentTime < userModel.getExpireTime()) {
+				newMap.put((String) entry.getKey(), userModel);
+			}
 		}
-		return Arrays.stream(o.toString().split(",")).collect(Collectors.toList());
+		return newMap;
 	}
 
 	@Override
-	public void setTokenListById(Long id, List<String> tokenList) {
-		HashSet<String> tokenStringSet = new HashSet<>(tokenList);
-		String joinList = String.join(",", tokenStringSet);
-		redisTemplate.opsForValue().set(getTokenKey(id + ""), joinList, TokenManager.getConfig().getTimeout(), TimeUnit.SECONDS);
+	public void setTokenInfoMapById(Long id, Map<String, UserModel> tokenMap) {
+		String idKey = getTokenKey(id + "");
+		Map<String, UserModel> newMap = new HashMap<>();
+		long currentTime = System.currentTimeMillis();
+		// 删除过期的key
+		for (Map.Entry<String, UserModel> entry : tokenMap.entrySet()) {
+			UserModel userModel = entry.getValue();
+			if (currentTime < userModel.getExpireTime()) {
+				newMap.put(entry.getKey(), userModel);
+			}
+		}
+		redisTemplate.opsForHash().putAll(idKey, newMap);
+		redisTemplate.expire(idKey, TokenManager.getConfig().getTimeout(), TimeUnit.SECONDS);
+	}
+
+	@Override
+	public UserModel getTokenInfoByToken(Long id, String token) {
+		String idKey = getTokenKey(id + "");
+		return (UserModel) redisTemplate.opsForHash().get(idKey, token);
 	}
 
 	@Override

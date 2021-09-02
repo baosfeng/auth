@@ -47,6 +47,10 @@ public class AuthConfig {
 	private String loginType = "login";
 	/** 临时身份登录后缀 */
 	private String tempSuffix = "temp";
+	/** 是否允许同端登录 */
+	private Boolean isAllowSampleDeviceLogin = true;
+	/** 踢人时,是否忽略待踢除的人未登录,未登录将自动登录 */
+	private Boolean kickOutIgnoreLogin = true;
 
 	public Boolean getEnable() {
 		return enable;
@@ -174,6 +178,22 @@ public class AuthConfig {
 		this.tempSuffix = tempSuffix;
 	}
 
+	public Boolean getAllowSampleDeviceLogin() {
+		return isAllowSampleDeviceLogin;
+	}
+
+	public void setAllowSampleDeviceLogin(Boolean allowSampleDeviceLogin) {
+		isAllowSampleDeviceLogin = allowSampleDeviceLogin;
+	}
+
+	public Boolean getKickOutIgnoreLogin() {
+		return kickOutIgnoreLogin;
+	}
+
+	public void setKickOutIgnoreLogin(Boolean kickOutIgnoreLogin) {
+		this.kickOutIgnoreLogin = kickOutIgnoreLogin;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -192,6 +212,8 @@ public class AuthConfig {
 				", checkWhiteUrlToken=" + checkWhiteUrlToken +
 				", loginType='" + loginType + '\'' +
 				", tempSuffix='" + tempSuffix + '\'' +
+				", isAllowSampleDeviceLogin=" + isAllowSampleDeviceLogin +
+				", kickOutIgnoreLogin=" + kickOutIgnoreLogin +
 				'}';
 	}
 }
