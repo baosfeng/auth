@@ -2,7 +2,6 @@ package xyz.bsfeng.auth.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
@@ -14,6 +13,7 @@ import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -29,7 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	private Boolean autoRenew;
 	private TokenDao tokenDao;
 	private Boolean enable;
-	@Autowired
+	@Resource(name = "authThreadPool")
 	private ThreadPoolExecutor poolExecutor;
 
 
