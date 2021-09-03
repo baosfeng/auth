@@ -433,7 +433,7 @@ public class TokenUtils {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
 		UserModel userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), userKey);
-		if (userModel.getOfflineTime() != null) {
+		if (userModel != null && userModel.getOfflineTime() != null) {
 			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
 		return userInfo;
