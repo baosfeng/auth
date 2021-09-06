@@ -44,6 +44,7 @@ public class TokenUtils {
 	private static Boolean checkWhiteUrlToken;
 	private static Boolean allowSampleDevice;
 	private static final Long ONE_DAY = 24 * 60 * 60 * 1000L;
+	private static Boolean enable;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 
 	private TokenUtils() {
@@ -69,6 +70,7 @@ public class TokenUtils {
 		whiteUrlList.add("/error");
 		checkWhiteUrlToken = authConfig.getCheckWhiteUrlToken();
 		allowSampleDevice = authConfig.getAllowSampleDeviceLogin();
+		enable = authConfig.getEnable();
 	}
 
 	public static String login(UserInfo userInfo) {
@@ -83,6 +85,9 @@ public class TokenUtils {
 	 * @return 登录token
 	 */
 	public static String login(UserInfo userInfo, AuthLoginModel loginModel) {
+		if (BooleanUtils.isFalse(enable)) {
+			throw new AuthException(414, "权限框架未启动!");
+		}
 		Long id = userInfo.getId();
 		if (id == null) {
 			throw new IllegalArgumentException("id不能为空");
@@ -139,6 +144,9 @@ public class TokenUtils {
 	 * @return 登录token
 	 */
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
+		if (BooleanUtils.isFalse(enable)) {
+			throw new AuthException(414, "权限框架未启动!");
+		}
 		Long id = authUser.getId();
 		if (id == null) {
 			authUser.setId(-2L);
@@ -379,6 +387,19 @@ public class TokenUtils {
 	 * @return 账户相关信息
 	 */
 	private static UserInfo getUserInfo() {
+		if (BooleanUtils.isFalse(enable)) {
+			return new UserInfo() {
+				@Override
+				public Long getId() {
+					return -3L;
+				}
+
+				@Override
+				public void setId(Long id) {
+
+				}
+			};
+		}
 		// 如果为白名单url, 返回-2
 		boolean isWhiteUrl = checkWhiteUrl();
 		if (isWhiteUrl && !checkWhiteUrlToken) {
