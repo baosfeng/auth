@@ -69,6 +69,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 		}
 		if (autoRenew) {
 			poolExecutor.submit(() -> {
+				request.setAttribute("id", userInfo.getId());
+				request.setAttribute("userInfo", userInfo);
 				tokenDao.updateUserInfo(token, userInfo);
 			});
 		}

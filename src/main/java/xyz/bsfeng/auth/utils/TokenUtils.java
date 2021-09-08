@@ -274,6 +274,11 @@ public class TokenUtils {
 	}
 
 	public static Long getId() {
+		HttpServletRequest request = SpringMVCUtil.getRequest();
+		Object id = request.getAttribute("id");
+		if (id != null) {
+			return (Long) id;
+		}
 		UserInfo user = getUser();
 		return user.getId();
 	}
@@ -387,6 +392,11 @@ public class TokenUtils {
 	 * @return 账户相关信息
 	 */
 	private static UserInfo getUserInfo() {
+		HttpServletRequest request = SpringMVCUtil.getRequest();
+		Object attribute = request.getAttribute("userInfo");
+		if (attribute != null) {
+			return (UserInfo) attribute;
+		}
 		if (BooleanUtils.isFalse(enable)) {
 			return new UserInfo() {
 				@Override
