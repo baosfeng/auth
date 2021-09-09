@@ -395,7 +395,14 @@ public class TokenUtils {
 		HttpServletRequest request = SpringMVCUtil.getRequest();
 		Object attribute = request.getAttribute("userInfo");
 		if (attribute != null) {
-			return (UserInfo) attribute;
+			UserInfo userInfo = (UserInfo) attribute;
+			if (BooleanUtils.isFalse(TokenManager.getConfig().getAllowSampleDeviceLogin())) {
+				UserModel userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), getToken());
+				if (userModel != null && userModel.getOfflineTime() != null) {
+					throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
+				}
+			}
+			return userInfo;
 		}
 		if (BooleanUtils.isFalse(enable)) {
 			return new UserInfo() {
