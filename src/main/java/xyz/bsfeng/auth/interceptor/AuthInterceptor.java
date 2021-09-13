@@ -17,7 +17,6 @@ import xyz.bsfeng.auth.utils.TokenUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 public class AuthInterceptor implements HandlerInterceptor {
 
 	private final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
-	private List<String> whiteTokenList;
 	private Boolean autoRenew;
 	private TokenDao tokenDao;
 	private Boolean enable;
@@ -36,19 +34,20 @@ public class AuthInterceptor implements HandlerInterceptor {
 	public void init() {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
-
-		whiteTokenList = Arrays.asList(authConfig.getWhiteTokenList().split(","));
 		autoRenew = authConfig.getAutoRenew();
 		enable = authConfig.getEnable();
 	}
 
 	@Override
+	@SuppressWarnings("all")
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 		log.info("正在访问{}", request.getRequestURI());
 		if (!enable) {
 			return true;
 		}
-		if (TokenUtils.checkWhiteUrl()) return true;
+		boolean isWhiteUrl = TokenUtils.checkWhiteUrl();
+		request.setAttribute("isWhiteUrl", isWhiteUrl);
+		if (isWhiteUrl) return true;
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
 			PreAuthorize annotation = handlerMethod.getMethodAnnotation(PreAuthorize.class);
@@ -58,20 +57,24 @@ public class AuthInterceptor implements HandlerInterceptor {
 			}
 		}
 
+		UserInfo userInfo = null;
 		String token = TokenUtils.getToken();
-		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
-			return true;
+		request.setAttribute("token", token);
+		try {
+			userInfo = TokenUtils.getUser();
+		} catch (AuthException e) {
+			throw e;
 		}
-
-		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
+		if (userInfo.getId() <= 0) return true;
 		if (autoRenew) {
+			UserInfo finalUserInfo = userInfo;
 			poolExecutor.submit(() -> {
-				request.setAttribute("id", userInfo.getId());
-				request.setAttribute("userInfo", userInfo);
-				tokenDao.updateUserInfo(token, userInfo);
+				request.setAttribute("id", finalUserInfo.getId());
+				request.setAttribute("userInfo", finalUserInfo);
+				tokenDao.updateUserInfo(token, finalUserInfo);
 			});
 		}
 		return true;

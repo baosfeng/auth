@@ -163,6 +163,7 @@ public class TokenUtils {
 		return token;
 	}
 
+	@SuppressWarnings("all")
 	public static void checkTempUser(TempUser authUser) {
 		UserInfo user = getUser();
 		if (user instanceof TempUser) {
@@ -405,72 +406,32 @@ public class TokenUtils {
 			return userInfo;
 		}
 		if (BooleanUtils.isFalse(enable)) {
-			return new UserInfo() {
-				@Override
-				public Long getId() {
-					return -3L;
-				}
-
-				@Override
-				public void setId(Long id) {
-
-				}
-			};
+			return new AuthUser(-3L);
 		}
 		// 如果为白名单url, 返回-2
-		boolean isWhiteUrl = checkWhiteUrl();
-		if (isWhiteUrl && !checkWhiteUrlToken) {
-			return new UserInfo() {
-				@Override
-				public Long getId() {
-					return -2L;
-				}
-
-				@Override
-				public void setId(Long id) {
-
-				}
-			};
-		}
-		// 当检测到白名单的token为空时，返回-2
+		boolean isWhiteUrl = (boolean) request.getAttribute("isWhiteUrl");
 		if (isWhiteUrl) {
+			if (!checkWhiteUrlToken) {
+				return new AuthUser(-2L);
+			}
 			try {
+				// 当检测到白名单的token为空时，返回-2
 				getToken();
 			} catch (AuthException e) {
-				return new UserInfo() {
-					@Override
-					public Long getId() {
-						return -2L;
-					}
-
-					@Override
-					public void setId(Long id) {
-
-					}
-				};
+				return new AuthUser(-2L);
 			}
 		}
-		String userKey = getToken();
+		Object requestAttribute = request.getAttribute("token");
+		String token = requestAttribute == null ? getToken() : (String) requestAttribute;
 		// 如果为白名单token, 返回-1
-		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(userKey))) {
-			return new UserInfo() {
-				@Override
-				public Long getId() {
-					return -1L;
-				}
-
-				@Override
-				public void setId(Long id) {
-
-				}
-
-			};
+		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
+			return new AuthUser(-1L);
 		}
-		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(userKey);
+		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
-		UserModel userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), userKey);
+		UserModel userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), token);
 		if (userModel != null && userModel.getOfflineTime() != null) {
 			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
