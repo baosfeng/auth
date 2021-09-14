@@ -510,7 +510,9 @@ public class TokenUtils {
 		String token = iterator.next();
 		// 检查相关用户信息是否需要更新
 		UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
-		if (BooleanUtils.isTrue(user.getLock())) {
+		if (user == null) {
+			tokenInfoMap.remove(token);
+		} else if (BooleanUtils.isTrue(user.getLock())) {
 			throw new AuthException(412, "账户已被封禁!");
 		}
 		if (!userInfo.equals(user)) {
@@ -519,7 +521,7 @@ public class TokenUtils {
 		}
 		long currentTime = System.currentTimeMillis();
 		tokenInfoMap.forEach((key, value) -> value.setExpireTime(currentTime + ONE_DAY));
-		tokenDao.setTokenInfoMapById(user.getId(), tokenInfoMap);
+		tokenDao.setTokenInfoMapById(userInfo.getId(), tokenInfoMap);
 		return token;
 	}
 }
