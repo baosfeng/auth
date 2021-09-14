@@ -2,6 +2,7 @@ package xyz.bsfeng.auth.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.FieldSensitive;
@@ -46,6 +47,7 @@ public class TokenUtils {
 	private static final Long ONE_DAY = 24 * 60 * 60 * 1000L;
 	private static Boolean enable;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
+	private static final AntPathMatcher MATCHER = new AntPathMatcher();
 
 	private TokenUtils() {
 	}
@@ -442,15 +444,8 @@ public class TokenUtils {
 		HttpServletRequest request = SpringMVCUtil.getRequest();
 		String uri = request.getRequestURI();
 		for (String white : whiteUrlList) {
-			if (white.endsWith("*")) {
-				white = white.replace("*", "");
-				if (uri.startsWith(white)) {
-					return true;
-				}
-			}
-			if (white.equalsIgnoreCase(uri)) {
-				return true;
-			}
+			boolean match = MATCHER.match(white, uri);
+			if (match) return true;
 		}
 		return false;
 	}
