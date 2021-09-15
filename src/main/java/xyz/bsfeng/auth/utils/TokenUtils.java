@@ -46,6 +46,7 @@ public class TokenUtils {
 	private static Boolean allowSampleDevice;
 	private static final Long ONE_DAY = 24 * 60 * 60 * 1000L;
 	private static Boolean enable;
+	private static Boolean isLog;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 	private static final AntPathMatcher MATCHER = new AntPathMatcher();
 
@@ -73,6 +74,7 @@ public class TokenUtils {
 		checkWhiteUrlToken = authConfig.getCheckWhiteUrlToken();
 		allowSampleDevice = authConfig.getAllowSampleDeviceLogin();
 		enable = authConfig.getEnable();
+		isLog = authConfig.getLog();
 	}
 
 	public static String login(UserInfo userInfo) {
@@ -130,6 +132,7 @@ public class TokenUtils {
 				.setExpireTime(System.currentTimeMillis() + ONE_DAY);
 		tokenInfoMap.put(token, userModel);
 		tokenDao.setTokenInfoMapById(id, tokenInfoMap);
+		if (isLog) log.info("登录成功,当前登录用户为:{}", userInfo);
 		return token;
 	}
 
@@ -162,6 +165,7 @@ public class TokenUtils {
 			token = tokenPrefix + TEMP_PREFIX + token;
 		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
+		if (isLog) log.info("登录成功,当前登录用户为:{}", authUser);
 		return token;
 	}
 
@@ -201,6 +205,7 @@ public class TokenUtils {
 			kickOut(token);
 		}
 		tokenDao.deleteTokenListById(id);
+		if (isLog) log.info("正在踢出{}的用户所有token", id);
 	}
 
 	/**
@@ -229,6 +234,7 @@ public class TokenUtils {
 			}
 		}
 		tokenDao.deleteUserInfo(token);
+		if (isLog) log.debug("正在踢出{}的用户", token);
 	}
 
 	/**
@@ -254,6 +260,7 @@ public class TokenUtils {
 				lock(token, lockTime);
 			}
 		}
+		if (isLog) log.info("封禁id为{}时间{}秒", id, lockTime);
 	}
 
 	/**
@@ -303,29 +310,33 @@ public class TokenUtils {
 
 
 	public static String getToken() {
-		String userKey = "";
+		String token = "";
+		String tokenFrom = "";
 		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
 		for (String from : readFrom) {
 			for (String tokenName : tokenNames) {
-				if (StringUtils.isNotEmpty(userKey)) {
-					break;
-				}
+				if (StringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:
-						userKey = doReadFromHeader(userKey, servletRequest, tokenName);
+						token = doReadFromHeader(token, servletRequest, tokenName);
 						break;
 					case AuthConstant.READ_FROM_URL:
-						userKey = doReadFromUrl(userKey, servletRequest, tokenName);
+						token = doReadFromUrl(token, servletRequest, tokenName);
 						break;
 					default:
 						throw new AuthException(AuthConstant.TYPE_NOT_SUPPORT_CODE, AuthConstant.TYPE_NOT_SUPPORT_MESSAGE);
 				}
 			}
+			if (StringUtils.isNotEmpty(token)) {
+				tokenFrom = from;
+				break;
+			}
 		}
-		if (StringUtils.isEmpty(userKey)) {
+		if (StringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, TOKEN_EMPTY_MESSAGE);
 		}
-		return userKey;
+		if (isLog) log.debug("从{}中获取到token:{}",tokenFrom,token);
+		return token;
 	}
 
 	private static String doReadFromUrl(String userKey, HttpServletRequest servletRequest, String tokenName) {

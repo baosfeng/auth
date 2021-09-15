@@ -29,6 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	private Boolean enable;
 	@Autowired
 	private ThreadPoolExecutor poolExecutor;
+	private Boolean isLog;
 
 
 	public void init() {
@@ -36,12 +37,13 @@ public class AuthInterceptor implements HandlerInterceptor {
 		tokenDao = TokenManager.getTokenDao();
 		autoRenew = authConfig.getAutoRenew();
 		enable = authConfig.getEnable();
+		isLog = authConfig.getLog();
 	}
 
 	@Override
 	@SuppressWarnings("all")
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		log.info("正在访问{}", request.getRequestURI());
+		if (isLog) log.debug("正在访问{}", request.getRequestURI());
 		if (!enable) {
 			return true;
 		}
@@ -57,7 +59,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 			}
 		}
 
-		UserInfo userInfo = null;
+		UserInfo userInfo;
 		String token = TokenUtils.getToken();
 		request.setAttribute("token", token);
 		try {
@@ -65,16 +67,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 		} catch (AuthException e) {
 			throw e;
 		}
-		if (userInfo == null) {
-			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
-		}
 		if (userInfo.getId() <= 0) return true;
 		if (autoRenew) {
-			UserInfo finalUserInfo = userInfo;
 			poolExecutor.submit(() -> {
-				request.setAttribute("id", finalUserInfo.getId());
-				request.setAttribute("userInfo", finalUserInfo);
-				tokenDao.updateUserInfo(token, finalUserInfo);
+				request.setAttribute("id", userInfo.getId());
+				request.setAttribute("userInfo", userInfo);
+				tokenDao.updateUserInfo(token, userInfo);
 			});
 		}
 		return true;

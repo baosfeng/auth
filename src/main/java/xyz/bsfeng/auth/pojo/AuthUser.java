@@ -2,6 +2,8 @@ package xyz.bsfeng.auth.pojo;
 
 import xyz.bsfeng.auth.dao.UserInfo;
 
+import java.util.Arrays;
+
 /**
  * 对于部分不想使用用户信息还需要继承接口的来说，可以利用此接口进行一些省事操作
  *
@@ -71,5 +73,16 @@ public class AuthUser extends UserInfo {
 	@Override
 	public void setLockTime(Long lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	@Override
+	public String toString() {
+		return "AuthUser{" +
+				"id=" + id +
+				", roles=" + Arrays.toString(roles) +
+				", auths=" + Arrays.toString(auths) +
+				", lock=" + lock +
+				", lockTime=" + lockTime +
+				'}';
 	}
 }

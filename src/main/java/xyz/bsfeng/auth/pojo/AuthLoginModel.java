@@ -27,4 +27,12 @@ public class AuthLoginModel {
 		this.timeout = timeout;
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "AuthLoginModel{" +
+				"device='" + device + '\'' +
+				", timeout=" + timeout +
+				'}';
+	}
 }

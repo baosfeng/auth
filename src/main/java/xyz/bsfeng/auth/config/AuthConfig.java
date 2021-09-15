@@ -51,6 +51,8 @@ public class AuthConfig {
 	private Boolean isAllowSampleDeviceLogin = true;
 	/** 踢人时,是否忽略待踢除的人未登录,未登录将自动登录 */
 	private Boolean kickOutIgnoreLogin = true;
+	/** 是否需要打开日志输出 */
+	private Boolean isLog = false;
 
 	public Boolean getEnable() {
 		return enable;
@@ -194,6 +196,14 @@ public class AuthConfig {
 		this.kickOutIgnoreLogin = kickOutIgnoreLogin;
 	}
 
+	public Boolean getLog() {
+		return isLog;
+	}
+
+	public void setLog(Boolean log) {
+		isLog = log;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -214,6 +224,7 @@ public class AuthConfig {
 				", tempSuffix='" + tempSuffix + '\'' +
 				", isAllowSampleDeviceLogin=" + isAllowSampleDeviceLogin +
 				", kickOutIgnoreLogin=" + kickOutIgnoreLogin +
+				", isLog=" + isLog +
 				'}';
 	}
 }

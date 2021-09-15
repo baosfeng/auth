@@ -2,6 +2,8 @@ package xyz.bsfeng.auth.pojo;
 
 import xyz.bsfeng.auth.dao.TempUser;
 
+import java.util.Arrays;
+
 /**
  * @author bsfeng
  * @date 2021/8/27 16:16
@@ -70,5 +72,16 @@ public class AuthTempUser extends TempUser {
 	@Override
 	public void setLockTime(Long lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	@Override
+	public String toString() {
+		return "AuthTempUser{" +
+				"id=" + id +
+				", roles=" + Arrays.toString(roles) +
+				", auths=" + Arrays.toString(auths) +
+				", lock=" + lock +
+				", lockTime=" + lockTime +
+				'}';
 	}
 }
