@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.utils;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -24,6 +26,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
@@ -49,8 +52,16 @@ public class TokenUtils {
 	private static Boolean isLog;
 	private static final ConcurrentHashMap<Class<?>, List<Field>> FIELDS_MAP = new ConcurrentHashMap<>();
 	private static final AntPathMatcher MATCHER = new AntPathMatcher();
+	private static final Cache<String, UserInfo> userCache;
 
 	private TokenUtils() {
+	}
+
+	static {
+		userCache = CacheBuilder.newBuilder()
+				.expireAfterWrite(1, TimeUnit.DAYS)
+				.recordStats()
+				.build();
 	}
 
 	public static void init() {
@@ -234,6 +245,7 @@ public class TokenUtils {
 			}
 		}
 		tokenDao.deleteUserInfo(token);
+		userCache.invalidate(token);
 		if (isLog) log.debug("正在踢出{}的用户", token);
 	}
 
@@ -281,6 +293,7 @@ public class TokenUtils {
 		user.setLock(true);
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
 		tokenDao.updateUserInfo(token, user);
+		userCache.put(token, user);
 	}
 
 	public static Long getId() {
@@ -335,7 +348,7 @@ public class TokenUtils {
 		if (StringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, TOKEN_EMPTY_MESSAGE);
 		}
-		if (isLog) log.debug("从{}中获取到token:{}",tokenFrom,token);
+		if (isLog) log.debug("从{}中获取到token:{}", tokenFrom, token);
 		return token;
 	}
 
@@ -436,6 +449,9 @@ public class TokenUtils {
 		}
 		Object requestAttribute = request.getAttribute("token");
 		String token = requestAttribute == null ? getToken() : (String) requestAttribute;
+		// 使用本地缓存进行快速的获取
+		UserInfo info = userCache.getIfPresent(token);
+		if (info != null) return info;
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
 			return new AuthUser(-1L);
@@ -448,6 +464,7 @@ public class TokenUtils {
 		if (userModel != null && userModel.getOfflineTime() != null) {
 			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
+		userCache.put(token, userInfo);
 		return userInfo;
 	}
 
