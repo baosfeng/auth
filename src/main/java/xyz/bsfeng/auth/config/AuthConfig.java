@@ -41,8 +41,6 @@ public class AuthConfig {
 	private String whiteTokenList = "";
 	/** 超级管理员的角色名称 */
 	private String adminRole = "administrator";
-	/** 是否检查白名单url的token信息 */
-	private Boolean checkWhiteUrlToken = false;
 	/** 用于实现多种业务平台，多个业务平台使用不同的认证 */
 	private String loginType = "login";
 	/** 临时身份登录后缀 */
@@ -156,14 +154,6 @@ public class AuthConfig {
 		this.adminRole = adminRole;
 	}
 
-	public Boolean getCheckWhiteUrlToken() {
-		return checkWhiteUrlToken;
-	}
-
-	public void setCheckWhiteUrlToken(Boolean checkWhiteUrlToken) {
-		this.checkWhiteUrlToken = checkWhiteUrlToken;
-	}
-
 	public String getLoginType() {
 		return loginType;
 	}
@@ -219,7 +209,6 @@ public class AuthConfig {
 				", whiteUrlList='" + whiteUrlList + '\'' +
 				", whiteTokenList='" + whiteTokenList + '\'' +
 				", adminRole='" + adminRole + '\'' +
-				", checkWhiteUrlToken=" + checkWhiteUrlToken +
 				", loginType='" + loginType + '\'' +
 				", tempSuffix='" + tempSuffix + '\'' +
 				", isAllowSampleDeviceLogin=" + isAllowSampleDeviceLogin +
