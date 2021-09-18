@@ -47,7 +47,6 @@ public class TokenConfiguration implements WebMvcConfigurer {
 		// 构建RedisTemplate
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(connectionFactory);
-		redisTemplate.setConnectionFactory(connectionFactory);
 		redisTemplate.setKeySerializer(keySerializer);
 		redisTemplate.setHashKeySerializer(keySerializer);
 		redisTemplate.setValueSerializer(valueSerializer);

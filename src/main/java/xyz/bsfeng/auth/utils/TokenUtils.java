@@ -12,7 +12,7 @@ import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.dao.UserModel;
+import xyz.bsfeng.auth.pojo.UserModel;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthLoginModel;
 import xyz.bsfeng.auth.pojo.AuthUser;

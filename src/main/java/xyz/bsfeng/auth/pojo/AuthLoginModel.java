@@ -1,10 +1,12 @@
 package xyz.bsfeng.auth.pojo;
 
+import java.io.Serializable;
+
 /**
  * @author bsfeng
  * @date 2021/9/1 16:43
  */
-public class AuthLoginModel {
+public class AuthLoginModel implements Serializable {
 	/** 设备标识,用于支持是否允许同端互斥登录 */
 	private String device;
 	/** token有效时间 */

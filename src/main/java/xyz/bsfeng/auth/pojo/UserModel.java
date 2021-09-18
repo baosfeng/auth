@@ -1,10 +1,12 @@
-package xyz.bsfeng.auth.dao;
+package xyz.bsfeng.auth.pojo;
+
+import java.io.Serializable;
 
 /**
  * @author bsfeng
  * @date 2021/9/1 16:57
  */
-public class UserModel {
+public class UserModel implements Serializable {
 	/** token过期时间 */
 	private Long expireTime;
 	/** 设备标识 */

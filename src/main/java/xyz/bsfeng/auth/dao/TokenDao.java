@@ -1,6 +1,8 @@
 package xyz.bsfeng.auth.dao;
 
 
+import xyz.bsfeng.auth.pojo.UserModel;
+
 import java.util.Map;
 
 /**

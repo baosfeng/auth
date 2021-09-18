@@ -3,6 +3,7 @@ package xyz.bsfeng.auth.pojo;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.utils.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -10,7 +11,7 @@ import java.util.Collection;
  * @author bsfeng
  * @date 2021/8/27 16:16
  */
-public class AuthTempUser extends TempUser {
+public class AuthTempUser extends TempUser implements Serializable {
 
 	private Long id;
 

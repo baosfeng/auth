@@ -2,18 +2,14 @@ package xyz.bsfeng.auth.dao;
 
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.SerializationException;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
-import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.pojo.UserModel;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.OBJECT_SERIALIZER_CODE;
-import static xyz.bsfeng.auth.constant.AuthConstant.OBJECT_SERIALIZER_MESSAGE;
 
 /**
  * @author bsfeng
@@ -40,11 +36,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 
 	@Override
 	public Object getUserInfo(String key) {
-		try {
-			return redisTemplate.opsForValue().get(getTokenKey(key));
-		} catch (SerializationException e) {
-			throw new AuthException(OBJECT_SERIALIZER_CODE, OBJECT_SERIALIZER_MESSAGE);
-		}
+		return redisTemplate.opsForValue().get(getTokenKey(key));
 	}
 
 	@Override

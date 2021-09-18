@@ -1,24 +1,25 @@
 package xyz.bsfeng.auth.pojo;
 
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.utils.CollectionUtils;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * 对于部分不想使用用户信息还需要继承接口的来说，可以利用此接口进行一些省事操作
+ * <p>
+ * 不允许被继承
  *
  * @author bsfeng
  * @date 2021/8/27 16:14
  */
-public final class AuthUser extends UserInfo {
+public class AuthUser extends UserInfo implements Serializable {
 
 	private Long id;
 	private String[] roles;
 	private String[] auths;
 	private Boolean lock = false;
 	private Long lockTime = System.currentTimeMillis();
-	private final Map<Object, Object> info = new HashMap<>();
 
 	private AuthUser() {
 	}
@@ -55,11 +56,6 @@ public final class AuthUser extends UserInfo {
 		this.roles = roles;
 	}
 
-	public void serRoles(Collection<String> roles) {
-		if (CollectionUtils.isEmpty(roles)) return;
-		this.roles = roles.toArray(new String[0]);
-	}
-
 	@Override
 	public String[] getAuths() {
 		return auths;
@@ -68,11 +64,6 @@ public final class AuthUser extends UserInfo {
 	@Override
 	public void setAuths(String... auths) {
 		this.auths = auths;
-	}
-
-	public void setAuths(Collection<String> auths) {
-		if (CollectionUtils.isEmpty(auths)) return;
-		this.auths = auths.toArray(new String[0]);
 	}
 
 	@Override
@@ -95,13 +86,6 @@ public final class AuthUser extends UserInfo {
 		this.lockTime = lockTime;
 	}
 
-	public void put(Object key, Object value) {
-		this.info.put(key, value);
-	}
-
-	public Object get(Object key) {
-		return this.info.get(key);
-	}
 
 	@Override
 	public String toString() {
@@ -111,7 +95,6 @@ public final class AuthUser extends UserInfo {
 				", auths=" + Arrays.toString(auths) +
 				", lock=" + lock +
 				", lockTime=" + lockTime +
-				", info=" + info +
 				'}';
 	}
 }
