@@ -20,6 +20,7 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.exception.AuthExceptionHandler;
+import xyz.bsfeng.auth.interceptor.AuthFilter;
 import xyz.bsfeng.auth.interceptor.AuthInterceptor;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.SpringUtils;
@@ -92,6 +93,11 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	@Bean
 	public AuthExceptionHandler authExceptionHandler() {
 		return new AuthExceptionHandler();
+	}
+
+	@Bean
+	public AuthFilter authFilter() {
+		return new AuthFilter();
 	}
 
 	@Bean("authThreadPool")

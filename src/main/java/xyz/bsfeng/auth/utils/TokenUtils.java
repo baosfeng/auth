@@ -4,7 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -12,16 +11,15 @@ import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.pojo.UserModel;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthLoginModel;
 import xyz.bsfeng.auth.pojo.AuthUser;
+import xyz.bsfeng.auth.pojo.UserModel;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
@@ -35,7 +33,6 @@ public class TokenUtils {
 	private static String[] readFrom;
 	private static Boolean ignoreCamelCase;
 	private static List<String> whiteTokenList;
-	private static List<String> whiteUrlList;
 	private static long timeout;
 	private static String tokenType;
 	private static String tokenPrefix;
@@ -43,7 +40,7 @@ public class TokenUtils {
 	private static final Long ONE_DAY = 24 * 60 * 60 * 1000L;
 	private static Boolean enable;
 	private static Boolean isLog;
-	private static final AntPathMatcher MATCHER = new AntPathMatcher();
+
 	private static final Cache<String, UserInfo> userCache;
 	private static final Cache<String, UserModel> idCache;
 
@@ -76,9 +73,6 @@ public class TokenUtils {
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType().toLowerCase();
 		tokenPrefix = authConfig.getTokenPrefix();
-		whiteUrlList = Arrays.stream(authConfig.getWhiteUrlList().split(",")).collect(Collectors.toList());
-		whiteUrlList.add("/favicon.ico");
-		whiteUrlList.add("/error");
 		allowSampleDevice = authConfig.getAllowSampleDeviceLogin();
 		enable = authConfig.getEnable();
 		isLog = authConfig.getLog();
@@ -443,22 +437,12 @@ public class TokenUtils {
 			return info;
 		}
 		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
+		checkUser(userInfo);
 		// 非临时用户可放入
 		if (!(userInfo instanceof TempUser)) {
 			userCache.put(token, userInfo);
 		}
-		checkUser(userInfo);
 		return userInfo;
-	}
-
-	public static boolean checkWhiteUrl() {
-		HttpServletRequest request = SpringMVCUtil.getRequest();
-		String uri = request.getRequestURI();
-		for (String white : whiteUrlList) {
-			boolean match = MATCHER.match(white, uri);
-			if (match) return true;
-		}
-		return false;
 	}
 
 	private static void checkUser(UserInfo userInfo) {

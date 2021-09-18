@@ -37,6 +37,8 @@ public class AuthConfig {
 	private String tokenType = "random16";
 	/** url放行白名单,支持通配符* */
 	private String whiteUrlList = "";
+	/** url黑名单,支持通配符,优先级高于白名单* */
+	private String blackUrlList = "";
 	/** token放行白名单 */
 	private String whiteTokenList = "";
 	/** 超级管理员的角色名称 */
@@ -138,6 +140,14 @@ public class AuthConfig {
 		this.whiteUrlList = whiteUrlList;
 	}
 
+	public String getBlackUrlList() {
+		return blackUrlList;
+	}
+
+	public void setBlackUrlList(String blackUrlList) {
+		this.blackUrlList = blackUrlList;
+	}
+
 	public String getWhiteTokenList() {
 		return whiteTokenList;
 	}
@@ -207,6 +217,7 @@ public class AuthConfig {
 				", globalShare=" + globalShare +
 				", tokenType='" + tokenType + '\'' +
 				", whiteUrlList='" + whiteUrlList + '\'' +
+				", blackUrlList='" + blackUrlList + '\'' +
 				", whiteTokenList='" + whiteTokenList + '\'' +
 				", adminRole='" + adminRole + '\'' +
 				", loginType='" + loginType + '\'' +
