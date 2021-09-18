@@ -14,9 +14,9 @@ public class HelloController {
 	@GetMapping("/login")
 	public String login(Long id) {
 		User user = new User(id);
-		user.setPassword("abc123");
 		user.setRoles("admin", "read", "write");
-		return TokenUtils.login(user);
+		AuthUser authUser = new AuthUser(id);
+		return TokenUtils.login(authUser);
 	}
 
 	@GetMapping("/login/device")

@@ -13,6 +13,8 @@ import java.util.Objects;
  */
 public abstract class TempUser extends UserInfo {
 	/**
+	 *
+	 * 如果不需要校验,那么默认不需要实现
 	 * 需要自定义的验证方法
 	 * 默认根据对象是否一致判断权限是否满足
 	 * @param tempUser

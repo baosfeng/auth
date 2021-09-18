@@ -1,14 +1,11 @@
 package com.example;
 
-import xyz.bsfeng.auth.anno.FieldSensitive;
-import xyz.bsfeng.auth.constant.SensitiveEnum;
 import xyz.bsfeng.auth.dao.UserInfo;
 
 public class User extends UserInfo {
 
 	private String mobilePhone;
 	private Long id;
-	@FieldSensitive(SensitiveEnum.PASSWORD)
 	private String password;
 	private String[] auths;
 	private Long lockTime;
