@@ -56,9 +56,11 @@ public class RedisTokenDaoImpl implements TokenDao {
 		String tokenKey = getTokenKey(key);
 		// 更新临时身份用户信息
 		if (userInfo instanceof TempUser) {
+			long lockTime = (userInfo.getLockTime() == null ? 0 : userInfo.getLockTime() - System.currentTimeMillis()) / 1000;
 			long timeout = getTimeout(tokenKey);
-			if (0 < timeout) {
-				redisTemplate.opsForValue().set(tokenKey, userInfo, timeout, TimeUnit.SECONDS);
+			long maxTimeout = Math.max(timeout, lockTime);
+			if (0 < maxTimeout) {
+				redisTemplate.opsForValue().set(tokenKey, userInfo, maxTimeout, TimeUnit.SECONDS);
 			}
 			return;
 		}

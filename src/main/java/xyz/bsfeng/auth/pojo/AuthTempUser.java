@@ -1,11 +1,9 @@
 package xyz.bsfeng.auth.pojo;
 
 import xyz.bsfeng.auth.dao.TempUser;
-import xyz.bsfeng.auth.utils.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * @author bsfeng
@@ -55,11 +53,6 @@ public class AuthTempUser extends TempUser implements Serializable {
 		this.roles = roles;
 	}
 
-	public void serRoles(Collection<String> roles) {
-		if (CollectionUtils.isEmpty(roles)) return;
-		this.roles = roles.toArray(new String[0]);
-	}
-
 	@Override
 	public String[] getAuths() {
 		return auths;
@@ -68,11 +61,6 @@ public class AuthTempUser extends TempUser implements Serializable {
 	@Override
 	public void setAuths(String... auths) {
 		this.auths = auths;
-	}
-
-	public void setAuths(Collection<String> auths) {
-		if (CollectionUtils.isEmpty(auths)) return;
-		this.auths = auths.toArray(new String[0]);
 	}
 
 	@Override
