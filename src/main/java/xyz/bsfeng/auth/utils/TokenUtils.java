@@ -338,7 +338,7 @@ public class TokenUtils {
 			}
 		}
 		if (StringUtils.isEmpty(token)) {
-			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, TOKEN_EMPTY_MESSAGE);
+			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得"+Arrays.toString(tokenNames)+"信息,请检查token名称是否正确");
 		}
 		if (isLog) log.debug("从{}中获取到token:{}", tokenFrom, token);
 		servletRequest.setAttribute("token", token);
@@ -438,7 +438,10 @@ public class TokenUtils {
 		}
 		// 使用本地缓存进行快速的获取
 		UserInfo info = userCache.getIfPresent(token);
-		if (info != null) return info;
+		if (info != null) {
+			checkUser(info);
+			return info;
+		}
 		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		// 非临时用户可放入
 		if (!(userInfo instanceof TempUser)) {
@@ -472,10 +475,6 @@ public class TokenUtils {
 			userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), token);
 			idCache.put(token, userModel);
 		}
-		// 检查是否被挤下线
-		if (userModel.getOfflineTime() != null) {
-			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
-		}
 		// 检查是否被封禁
 		if (BooleanUtils.isTrue(userInfo.getLock())) {
 			long millis = System.currentTimeMillis();
@@ -488,6 +487,10 @@ public class TokenUtils {
 			tokenDao.updateUserInfo(token, userInfo);
 			// 更新用户信息
 			userCache.put(token, userInfo);
+		}
+		// 检查是否被挤下线
+		if (userModel.getOfflineTime() != null) {
+			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
 	}
 

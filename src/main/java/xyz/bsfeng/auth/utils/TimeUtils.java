@@ -50,7 +50,7 @@ public class TimeUtils {
 
 	public static String longToTime(Long time) {
 		Instant instant = Instant.ofEpochMilli(time);
-		return DATE_TIME_FORMATTER.format(instant.atOffset(ZoneOffset.ofHours(0)).toLocalDateTime());
+		return DATE_TIME_FORMATTER.format(instant.atOffset(ZoneOffset.ofHours(8)).toLocalDateTime());
 	}
 
 }
