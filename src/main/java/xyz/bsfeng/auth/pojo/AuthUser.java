@@ -27,6 +27,14 @@ public final class AuthUser extends UserInfo {
 		this.id = id;
 	}
 
+	public AuthUser(Long id, String[] roles, String[] auths, Boolean lock, Long lockTime) {
+		this.id = id;
+		this.roles = roles;
+		this.auths = auths;
+		this.lock = lock;
+		this.lockTime = lockTime;
+	}
+
 	@Override
 	public Long getId() {
 		return id;

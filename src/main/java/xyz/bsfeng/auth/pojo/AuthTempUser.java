@@ -26,6 +26,14 @@ public class AuthTempUser extends TempUser {
 	private AuthTempUser() {
 	}
 
+	public AuthTempUser(Long id, String[] roles, String[] auths, Boolean lock, Long lockTime) {
+		this.id = id;
+		this.roles = roles;
+		this.auths = auths;
+		this.lock = lock;
+		this.lockTime = lockTime;
+	}
+
 	@Override
 	public Long getId() {
 		return id;

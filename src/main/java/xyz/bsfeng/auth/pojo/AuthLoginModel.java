@@ -10,6 +10,14 @@ public class AuthLoginModel {
 	/** token有效时间 */
 	private Long timeout;
 
+	public AuthLoginModel() {
+	}
+
+	AuthLoginModel(String device, Long timeout) {
+		this.device = device;
+		this.timeout = timeout;
+	}
+
 	public String getDevice() {
 		return device;
 	}
