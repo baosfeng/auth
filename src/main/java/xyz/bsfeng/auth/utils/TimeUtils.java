@@ -13,6 +13,14 @@ import java.util.Date;
  */
 public class TimeUtils {
 
+	public static Long ONE_SECOND = 1L;
+	public static Long ONE_MINUTE = 60L;
+	public static Long ONE_HOUR = 60 * 60L;
+	public static Long ONE_DAY = 60 * 60 * 24L;
+	public static Long ONE_WEEK = 60 * 60 * 24 * 7L;
+	public static Long ONE_MONTH = 60 * 60 * 24 * 30L;
+	public static Long ONE_YEAR = 60 * 60 * 24 * 365L;
+
 	private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH时mm分ss秒");
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
