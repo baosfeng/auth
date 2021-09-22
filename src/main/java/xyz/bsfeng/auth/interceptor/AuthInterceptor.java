@@ -10,6 +10,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
+import xyz.bsfeng.auth.anno.IgnoreLogin;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
@@ -76,6 +77,11 @@ public class AuthInterceptor implements HandlerInterceptor {
 			if (annotation != null) {
 				checkRoles(annotation);
 				checkAuths(annotation);
+			}
+			IgnoreLogin ignoreLogin = handlerMethod.getMethodAnnotation(IgnoreLogin.class);
+			if (ignoreLogin != null) {
+				request.setAttribute("isWhiteUrl", isWhiteUrl);
+				return true;
 			}
 		}
 
