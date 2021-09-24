@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.anno;
 
+import org.springframework.core.annotation.Order;
+
 import java.lang.annotation.*;
 
 /**
@@ -11,5 +13,6 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Order
 public @interface IgnoreLogin {
 }
