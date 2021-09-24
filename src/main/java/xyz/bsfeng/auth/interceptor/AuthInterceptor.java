@@ -80,7 +80,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 			}
 			IgnoreLogin ignoreLogin = handlerMethod.getMethodAnnotation(IgnoreLogin.class);
 			if (ignoreLogin != null) {
-				request.setAttribute("isWhiteUrl", isWhiteUrl);
+				request.setAttribute("isWhiteUrl", true);
 				return true;
 			}
 		}
