@@ -455,7 +455,7 @@ public class TokenUtils {
 		if (obj == null) return;
 		String token = (String) obj;
 		UserModel userModel = idCache.getIfPresent(token);
-		if (userModel == null) {
+		if (userModel == null && !token.startsWith(AuthConstant.TEMP_PREFIX)) {
 			userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), token);
 			idCache.put(token, userModel);
 		}
@@ -473,7 +473,7 @@ public class TokenUtils {
 			userCache.put(token, userInfo);
 		}
 		// 检查是否被挤下线
-		if (userModel.getOfflineTime() != null) {
+		if (userModel != null && userModel.getOfflineTime() != null) {
 			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
 	}
