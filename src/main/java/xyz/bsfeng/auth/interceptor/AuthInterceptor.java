@@ -11,6 +11,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.IgnoreLogin;
+import xyz.bsfeng.auth.anno.MustLogin;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
@@ -68,7 +69,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (!enable) {
 			return true;
 		}
-		boolean isWhiteUrl = checkWhiteUrl();
+		boolean isWhiteUrl = checkWhiteUrl(handler);
 		request.setAttribute("isWhiteUrl", isWhiteUrl);
 		if (isWhiteUrl) return true;
 		if (handler instanceof HandlerMethod) {
@@ -156,12 +157,17 @@ public class AuthInterceptor implements HandlerInterceptor {
 		throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
 	}
 
-	public static boolean checkWhiteUrl() {
+	public static boolean checkWhiteUrl(Object handler) {
 		HttpServletRequest request = SpringMVCUtil.getRequest();
 		String uri = request.getRequestURI();
 		for (String url : blackUrlList) {
 			boolean match = MATCHER.match(url, uri);
 			if (match) return false;
+		}
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			MustLogin mustLogin = handlerMethod.getMethodAnnotation(MustLogin.class);
+			if (mustLogin != null) return false;
 		}
 		for (String white : whiteUrlList) {
 			boolean match = MATCHER.match(white, uri);
