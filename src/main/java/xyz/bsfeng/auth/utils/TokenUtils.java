@@ -293,7 +293,7 @@ public class TokenUtils {
 
 	public static Long getId() {
 		HttpServletRequest request = SpringMVCUtil.getRequest();
-		Object id = request.getAttribute("id");
+		Object id = request.getAttribute("userId");
 		if (id != null) {
 			return (Long) id;
 		}
@@ -438,6 +438,8 @@ public class TokenUtils {
 		}
 		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		checkUser(userInfo);
+		request.setAttribute("userInfo", userInfo);
+		request.setAttribute("userId", userInfo.getId());
 		// 非临时用户可放入
 		if (!(userInfo instanceof TempUser)) {
 			userCache.put(token, userInfo);

@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -20,7 +19,9 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.exception.AuthExceptionHandler;
+import xyz.bsfeng.auth.interceptor.AuthFilter;
 import xyz.bsfeng.auth.interceptor.AuthInterceptor;
+import xyz.bsfeng.auth.listener.ApplicationStartListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.SpringUtils;
 
@@ -79,9 +80,18 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	@Order
 	public AuthInterceptor authInterceptor() {
 		return new AuthInterceptor();
+	}
+
+	@Bean
+	public AuthFilter authFilter() {
+		return new AuthFilter();
+	}
+
+	@Bean
+	public ApplicationStartListener applicationStartListener() {
+		return new ApplicationStartListener();
 	}
 
 	@Override
