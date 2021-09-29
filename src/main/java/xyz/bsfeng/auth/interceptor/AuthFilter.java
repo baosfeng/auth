@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -41,11 +42,13 @@ public class AuthFilter implements Filter {
 	private ThreadPoolExecutor poolExecutor;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private String token;
+	@Value("${error.path:/error}")
+	private String errorPath;
 
 	public void init() {
 		authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
-		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", "/error"));
+		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
 		if (StringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
 			String s = authConfig.getWhiteUrlList() + "," + join;
 			authConfig.setWhiteUrlList(s);
@@ -59,7 +62,10 @@ public class AuthFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		if (!authConfig.getEnable()) chain.doFilter(request, response);
+		if (!authConfig.getEnable()) {
+			chain.doFilter(request, response);
+			return;
+		}
 		HttpServletRequest servletRequest = (HttpServletRequest) request;
 		HttpServletResponse servletResponse = (HttpServletResponse) response;
 		if (authConfig.getLog()) log.debug("正在访问{}", servletRequest.getRequestURI());
@@ -68,6 +74,7 @@ public class AuthFilter implements Filter {
 		if (isWhiteUrl) {
 			try {
 				chain.doFilter(request, response);
+				return;
 			} catch (AuthException e) {
 				sendErrorMessage(servletResponse, e);
 				return;
@@ -77,6 +84,9 @@ public class AuthFilter implements Filter {
 		try {
 			token = TokenUtils.getToken();
 			userInfo = TokenUtils.getUser();
+			if (authConfig.getAutoRenew()) {
+				poolExecutor.submit(() -> tokenDao.updateUserInfo(token, userInfo));
+			}
 		} catch (AuthException e) {
 			sendErrorMessage(servletResponse, e);
 			return;
@@ -85,17 +95,11 @@ public class AuthFilter implements Filter {
 			chain.doFilter(request, response);
 		} catch (AuthException e) {
 			sendErrorMessage(servletResponse, e);
-			return;
 		}
-		if (authConfig.getAutoRenew()) {
-			poolExecutor.submit(() -> {
-				tokenDao.updateUserInfo(token, userInfo);
-			});
-		}
-
 	}
 
 	private void sendErrorMessage(HttpServletResponse servletResponse, AuthException e) throws IOException {
+		if (servletResponse.isCommitted()) return;
 		servletResponse.setContentType("application/json; charset=UTF-8");
 		servletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		HashMap<String, Object> map = new HashMap<>(4);
@@ -104,6 +108,7 @@ public class AuthFilter implements Filter {
 		PrintWriter writer = servletResponse.getWriter();
 		writer.write(objectMapper.writeValueAsString(map));
 		writer.flush();
+		writer.close();
 	}
 
 	public static boolean checkWhiteUrl(HttpServletRequest request) {

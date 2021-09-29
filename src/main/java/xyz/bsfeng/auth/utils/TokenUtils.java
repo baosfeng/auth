@@ -84,7 +84,7 @@ public class TokenUtils {
 
 	/**
 	 * 此方法用于实现多端登录,注意,如果使用了全局共享token,那么将不会派上用场,返回仍旧为原始token
-	 *
+	 * <p>
 	 * 如果仅配置了不允许多端登录,但是没有配置loginModel,此方法依然无效
 	 * 默认允许多端登录
 	 *
@@ -172,6 +172,7 @@ public class TokenUtils {
 
 	/**
 	 * 用于二次校验身份
+	 *
 	 * @param authUser
 	 */
 	@SuppressWarnings("all")
@@ -335,7 +336,7 @@ public class TokenUtils {
 			}
 		}
 		if (StringUtils.isEmpty(token)) {
-			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得"+Arrays.toString(tokenNames)+"信息,请检查token名称是否正确");
+			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得" + Arrays.toString(tokenNames) + "信息,请检查token名称是否正确");
 		}
 		if (isLog) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
 		servletRequest.setAttribute("token", token);
@@ -461,7 +462,7 @@ public class TokenUtils {
 		UserModel userModel = idCache.getIfPresent(token);
 		if (userModel == null && !token.startsWith(AuthConstant.TEMP_PREFIX)) {
 			userModel = tokenDao.getTokenInfoByToken(userInfo.getId(), token);
-			idCache.put(token, userModel);
+			if (userModel != null) idCache.put(token, userModel);
 		}
 		// 检查是否被封禁
 		if (BooleanUtils.isTrue(userInfo.getLock())) {
