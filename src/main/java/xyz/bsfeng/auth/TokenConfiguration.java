@@ -18,7 +18,6 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.exception.AuthExceptionHandler;
 import xyz.bsfeng.auth.interceptor.AuthFilter;
 import xyz.bsfeng.auth.interceptor.AuthInterceptor;
 import xyz.bsfeng.auth.listener.ApplicationStartListener;
@@ -98,12 +97,6 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(authInterceptor());
 	}
-
-	@Bean
-	public AuthExceptionHandler authExceptionHandler() {
-		return new AuthExceptionHandler();
-	}
-
 
 	@Bean("authThreadPool")
 	@Qualifier("authThreadPool")

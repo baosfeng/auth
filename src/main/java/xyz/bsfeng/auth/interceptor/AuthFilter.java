@@ -122,6 +122,7 @@ public class AuthFilter implements Filter {
 				return true;
 			}
 		}
+		request.setAttribute("isWhiteUrl", false);
 		return false;
 	}
 }

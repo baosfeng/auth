@@ -312,14 +312,17 @@ public class TokenUtils {
 		if (attribute != null) return (String) attribute;
 		String token = "";
 		String tokenFrom = "";
+		String currentTokenName = "";
 		for (String from : readFrom) {
 			for (String tokenName : tokenNames) {
 				if (StringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:
+						currentTokenName = tokenName;
 						token = doReadFromHeader(token, servletRequest, tokenName);
 						break;
 					case AuthConstant.READ_FROM_URL:
+						currentTokenName = tokenName;
 						token = doReadFromUrl(token, servletRequest, tokenName);
 						break;
 					default:
@@ -334,7 +337,7 @@ public class TokenUtils {
 		if (StringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得"+Arrays.toString(tokenNames)+"信息,请检查token名称是否正确");
 		}
-		if (isLog) log.debug("从{}中获取到token:{}", tokenFrom, token);
+		if (isLog) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
 		servletRequest.setAttribute("token", token);
 		return token;
 	}
@@ -424,8 +427,7 @@ public class TokenUtils {
 		if (isWhiteUrl) {
 			return new AuthUser(-2L);
 		}
-		Object requestAttribute = request.getAttribute("token");
-		String token = requestAttribute == null ? getToken() : (String) requestAttribute;
+		String token = getToken();
 		// 如果为白名单token, 返回-1
 		if (whiteTokenList.stream().anyMatch(itm -> itm.equalsIgnoreCase(token))) {
 			return new AuthUser(-1L);
