@@ -48,6 +48,8 @@ public class ApplicationStartListener implements ApplicationListener<Application
 		Set<String> blackUrlSet = Sets.newHashSet();
 		for (String annotation : strings) {
 			Class<?> type = AopUtils.getTargetClass(applicationContext.getBean(annotation));
+			doWhiteUrl(whiteUrlSet, type);
+			doBlackUrl(blackUrlSet, type);
 			Method[] methods = type.getDeclaredMethods();
 			for (Method method : methods) {
 				whiteUrlSet.addAll(doWhiteList(type, method));
@@ -76,6 +78,32 @@ public class ApplicationStartListener implements ApplicationListener<Application
 
 		AuthFilter authFilter = applicationContext.getBean(AuthFilter.class);
 		authFilter.init();
+	}
+
+	private void doWhiteUrl(Set<String> whiteUrlSet, Class<?> type) {
+		IgnoreLogin ignoreLogin = type.getAnnotation(IgnoreLogin.class);
+		if (ignoreLogin != null) {
+			doUrl(whiteUrlSet, type);
+		}
+	}
+
+	private void doUrl(Set<String> whiteUrlSet, Class<?> type) {
+		RequestMapping mapping = type.getAnnotation(RequestMapping.class);
+		if (mapping != null) {
+			for (String value : mapping.value()) {
+				if (!value.endsWith("/")) {
+					value = value + "/";
+				}
+				whiteUrlSet.add(value + "**");
+			}
+		}
+	}
+
+	private void doBlackUrl(Set<String> blackUrlSet, Class<?> type) {
+		MustLogin mustLogin = type.getAnnotation(MustLogin.class);
+		if (mustLogin != null) {
+			doUrl(blackUrlSet, type);
+		}
 	}
 
 	private Set<String> doWhiteList(Class<?> type, Method method) {
