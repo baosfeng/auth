@@ -5,9 +5,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.event.UserBeginRequestEvent;
+import xyz.bsfeng.auth.event.UserEndRequestFailedEvent;
+import xyz.bsfeng.auth.event.UserEndRequestSuccessEvent;
 import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.SpringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -17,12 +22,13 @@ import java.util.stream.Collectors;
 public class AuthInterceptor implements HandlerInterceptor {
 
 
-
 	@Override
-	@SuppressWarnings("all")
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+	public boolean preHandle(@Nonnull HttpServletRequest request,
+	                         @Nonnull HttpServletResponse response,
+	                         @Nonnull Object handler) {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			SpringUtils.publishEvent(new UserBeginRequestEvent(request, handlerMethod));
 			PreAuthorize annotation = handlerMethod.getMethodAnnotation(PreAuthorize.class);
 			if (annotation != null) {
 				checkRoles(annotation);
@@ -30,6 +36,21 @@ public class AuthInterceptor implements HandlerInterceptor {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public void afterCompletion(@Nonnull HttpServletRequest request,
+	                            @Nonnull HttpServletResponse response,
+	                            @Nonnull Object handler,
+	                            Exception ex) throws Exception {
+		if (handler instanceof HandlerMethod) {
+			if (ex == null) {
+				SpringUtils.publishEvent(new UserEndRequestSuccessEvent(request, response, (HandlerMethod)handler));
+			} else {
+				SpringUtils.publishEvent(new UserEndRequestFailedEvent(request, response, (HandlerMethod) handler, ex));
+			}
+		}
+		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 	}
 
 	private void checkAuths(PreAuthorize annotation) {

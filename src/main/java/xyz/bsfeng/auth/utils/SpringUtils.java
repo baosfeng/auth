@@ -3,13 +3,16 @@ package xyz.bsfeng.auth.utils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+
+import javax.annotation.Nonnull;
 
 public class SpringUtils implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 
 	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
+	public void setApplicationContext(@Nonnull ApplicationContext context) throws BeansException {
 		applicationContext = context;
 	}
 
@@ -17,5 +20,9 @@ public class SpringUtils implements ApplicationContextAware {
 		return applicationContext.getBean(clazz);
 	}
 
+
+	public static void publishEvent(ApplicationEvent applicationEvent) {
+		applicationContext.publishEvent(applicationEvent);
+	}
 
 }

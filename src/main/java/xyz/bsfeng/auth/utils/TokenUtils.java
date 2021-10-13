@@ -11,6 +11,7 @@ import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
+import xyz.bsfeng.auth.event.*;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthLoginModel;
 import xyz.bsfeng.auth.pojo.AuthUser;
@@ -133,6 +134,7 @@ public class TokenUtils {
 				.setExpireTime(System.currentTimeMillis() + ONE_DAY);
 		tokenInfoMap.put(token, userModel);
 		tokenDao.setTokenInfoMapById(id, tokenInfoMap);
+		SpringUtils.publishEvent(new UserLoginEvent(userInfo, userModel));
 		if (isLog) log.info("登录成功,当前登录用户为:{}", userInfo);
 		return token;
 	}
@@ -167,6 +169,7 @@ public class TokenUtils {
 		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		if (isLog) log.info("登录成功,当前登录用户为:{}", authUser);
+		SpringUtils.publishEvent(new UserLoginEvent(authUser, null));
 		return token;
 	}
 
@@ -198,7 +201,9 @@ public class TokenUtils {
 	 * 默认退出的是当前账户的token,注意账户被封禁无法正常退出
 	 */
 	public static void logout() {
-		kickOut(getToken());
+		String token = getToken();
+		kickOut(token);
+		SpringUtils.publishEvent(new UserLogoutEvent(token));
 	}
 
 	/**
@@ -212,6 +217,7 @@ public class TokenUtils {
 		}
 		tokenDao.deleteTokenListById(id);
 		if (isLog) log.info("正在踢出{}的用户所有token", id);
+		SpringUtils.publishEvent(new UserKickOutEvent(id));
 	}
 
 	/**
@@ -243,6 +249,7 @@ public class TokenUtils {
 		tokenDao.deleteUserInfo(token);
 		userCache.invalidate(token);
 		if (isLog) log.debug("正在踢出{}的用户", token);
+		SpringUtils.publishEvent(new UserTokenKickOutEvent(user, token));
 	}
 
 	/**
@@ -269,6 +276,7 @@ public class TokenUtils {
 			}
 		}
 		if (isLog) log.info("封禁id为{}时间{}秒", id, lockTime);
+		SpringUtils.publishEvent(new UserLockEvent(id, lockTime));
 	}
 
 	/**
@@ -290,6 +298,7 @@ public class TokenUtils {
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
 		tokenDao.updateUserInfo(token, user);
 		userCache.put(token, user);
+		SpringUtils.publishEvent(new UserTokenLockEvent(token, lockTime));
 	}
 
 	public static Long getId() {
@@ -497,6 +506,7 @@ public class TokenUtils {
 		long currentTime = System.currentTimeMillis();
 		tokenInfoMap.forEach((key, value) -> value.setExpireTime(currentTime + ONE_DAY));
 		tokenDao.setTokenInfoMapById(userInfo.getId(), tokenInfoMap);
+		SpringUtils.publishEvent(new UserLoginEvent(userInfo, null));
 		return token;
 	}
 }
