@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.interceptor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -21,10 +20,10 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static xyz.bsfeng.auth.utils.MessageUtils.sendErrorMessage;
 
 /**
  * @author bsfeng
@@ -40,7 +39,7 @@ public class AuthFilter implements Filter {
 	private static final AntPathMatcher MATCHER = new AntPathMatcher();
 	@Autowired
 	private ThreadPoolExecutor poolExecutor;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+
 	private String token;
 	@Value("${error.path:/error}")
 	private String errorPath;
@@ -91,24 +90,7 @@ public class AuthFilter implements Filter {
 			sendErrorMessage(servletResponse, e);
 			return;
 		}
-		try {
-			chain.doFilter(request, response);
-		} catch (AuthException e) {
-			sendErrorMessage(servletResponse, e);
-		}
-	}
-
-	private void sendErrorMessage(HttpServletResponse servletResponse, AuthException e) throws IOException {
-		if (servletResponse.isCommitted()) return;
-		servletResponse.setContentType("application/json; charset=UTF-8");
-		servletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-		HashMap<String, Object> map = new HashMap<>(4);
-		map.put("code", e.getCode());
-		map.put("message", e.getMessage());
-		PrintWriter writer = servletResponse.getWriter();
-		writer.write(objectMapper.writeValueAsString(map));
-		writer.flush();
-		writer.close();
+		chain.doFilter(request, response);
 	}
 
 	public static boolean checkWhiteUrl(HttpServletRequest request) {

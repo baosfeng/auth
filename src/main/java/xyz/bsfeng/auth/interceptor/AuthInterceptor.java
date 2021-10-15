@@ -9,12 +9,14 @@ import xyz.bsfeng.auth.event.UserBeginRequestEvent;
 import xyz.bsfeng.auth.event.UserEndRequestFailedEvent;
 import xyz.bsfeng.auth.event.UserEndRequestSuccessEvent;
 import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.MessageUtils;
 import xyz.bsfeng.auth.utils.SpringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,14 +27,19 @@ public class AuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(@Nonnull HttpServletRequest request,
 	                         @Nonnull HttpServletResponse response,
-	                         @Nonnull Object handler) {
+	                         @Nonnull Object handler) throws IOException {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
 			SpringUtils.publishEvent(new UserBeginRequestEvent(request, handlerMethod));
 			PreAuthorize annotation = handlerMethod.getMethodAnnotation(PreAuthorize.class);
 			if (annotation != null) {
-				checkRoles(annotation);
-				checkAuths(annotation);
+				try {
+					checkRoles(annotation);
+					checkAuths(annotation);
+				} catch (AuthException e) {
+					MessageUtils.sendErrorMessage(response, e);
+					throw e;
+				}
 			}
 		}
 		return true;
@@ -58,7 +65,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (value.length == 0) {
 			return;
 		}
-		String[] auths = TokenUtils.getUser().getRoles();
+		String[] auths = TokenUtils.getUser().getAuths();
 		if (auths == null) {
 			throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 		}
@@ -86,7 +93,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		}
 		String[] roles = TokenUtils.getUser().getRoles();
 		if (roles == null) {
-			throw new AuthException(AuthConstant.ACCOUNT_NO_ANY_ROLE_CODE, AuthConstant.ACCOUNT_NO_ANY_ROLE_MESSAGE);
+			throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
 		}
 		// 验证是否为超管
 		boolean isAdmin = Arrays.stream(roles)
