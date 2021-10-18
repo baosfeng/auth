@@ -9,9 +9,7 @@ import xyz.bsfeng.auth.event.UserBeginRequestEvent;
 import xyz.bsfeng.auth.event.UserEndRequestFailedEvent;
 import xyz.bsfeng.auth.event.UserEndRequestSuccessEvent;
 import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.MessageUtils;
-import xyz.bsfeng.auth.utils.SpringUtils;
-import xyz.bsfeng.auth.utils.TokenUtils;
+import xyz.bsfeng.auth.utils.*;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -35,12 +33,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 			if (annotation != null) {
 				try {
 					String[] role = annotation.hasRole();
-					if (role != null && role.length != 0) {
-						checkRoles(annotation);
+					Set<String> roleSet = Arrays.stream(role).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
+					if (CollectionUtils.isNotEmpty(roleSet)) {
+						checkRoles(roleSet);
 					}
 					String[] auths = annotation.hasAuth();
-					if (auths != null && auths.length != 0) {
-						checkAuths(annotation);
+					Set<String> authSet = Arrays.stream(auths).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
+					if (CollectionUtils.isNotEmpty(authSet)) {
+						checkAuths(authSet);
 					}
 				} catch (AuthException e) {
 					MessageUtils.sendErrorMessage(response, e);
@@ -66,11 +66,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 	}
 
-	private void checkAuths(PreAuthorize annotation) {
-		String[] value = annotation.hasAuth();
-		if (value.length == 0) {
-			return;
-		}
+	private void checkAuths(Set<String> authSet) {
 		String[] auths = TokenUtils.getUser().getAuths();
 		if (auths == null) {
 			throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
@@ -78,13 +74,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 		// 验证是否为超管
 		boolean isAdmin = Arrays.stream(auths)
 				.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
-		if (isAdmin) {
-			return;
-		}
+		if (isAdmin) return;
 		// 只要拥有的权限中存在某一个指定的权限即可
-		Set<String> checkSet = Arrays.stream(value).collect(Collectors.toSet());
 		Set<String> authsSet = Arrays.stream(auths).collect(Collectors.toSet());
-		for (String role : checkSet) {
+		for (String role : authSet) {
 			if (authsSet.contains(role)) {
 				return;
 			}
@@ -92,11 +85,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 	}
 
-	private void checkRoles(PreAuthorize annotation) {
-		String[] value = annotation.hasRole();
-		if (value.length == 0) {
-			return;
-		}
+	private void checkRoles(Set<String> roleSet) {
 		String[] roles = TokenUtils.getUser().getRoles();
 		if (roles == null) {
 			throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
@@ -108,9 +97,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 			return;
 		}
 		// 只要拥有的权限中存在某一个指定的权限即可
-		Set<String> checkSet = Arrays.stream(value).collect(Collectors.toSet());
 		Set<String> rolesSet = Arrays.stream(roles).collect(Collectors.toSet());
-		for (String role : checkSet) {
+		for (String role : roleSet) {
 			if (rolesSet.contains(role)) {
 				return;
 			}
