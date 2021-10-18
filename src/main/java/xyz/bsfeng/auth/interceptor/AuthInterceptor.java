@@ -34,8 +34,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 			PreAuthorize annotation = handlerMethod.getMethodAnnotation(PreAuthorize.class);
 			if (annotation != null) {
 				try {
-					checkRoles(annotation);
-					checkAuths(annotation);
+					String[] role = annotation.hasRole();
+					if (role != null && role.length != 0) {
+						checkRoles(annotation);
+					}
+					String[] auths = annotation.hasAuth();
+					if (auths != null && auths.length != 0) {
+						checkAuths(annotation);
+					}
 				} catch (AuthException e) {
 					MessageUtils.sendErrorMessage(response, e);
 					throw e;
