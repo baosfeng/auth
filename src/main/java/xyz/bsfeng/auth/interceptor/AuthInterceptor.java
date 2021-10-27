@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,6 +72,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (auths == null) {
 			throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 		}
+		auths = Arrays.stream(auths).filter(Objects::nonNull).toArray(String[]::new);
+		if (auths.length == 0) {
+			throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
+		}
 		// 验证是否为超管
 		boolean isAdmin = Arrays.stream(auths)
 				.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
@@ -88,6 +93,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 	private void checkRoles(Set<String> roleSet) {
 		String[] roles = TokenUtils.getUser().getRoles();
 		if (roles == null) {
+			throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
+		}
+		roles = Arrays.stream(roles).filter(Objects::nonNull).toArray(String[]::new);
+		if (roles.length == 0) {
 			throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
 		}
 		// 验证是否为超管
