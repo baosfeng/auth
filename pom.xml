@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>xyz.bsfeng</groupId>
     <artifactId>auth-spring-boot-starter</artifactId>
@@ -51,5 +51,25 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus-releases</id>
+            <url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>nexus-snapshots</id>
+            <url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+        </repository>
+        <repository>
+            <id>nexus-releases</id>
+            <url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
 
 </project>
