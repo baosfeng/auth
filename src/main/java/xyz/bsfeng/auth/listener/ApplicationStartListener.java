@@ -60,20 +60,20 @@ public class ApplicationStartListener implements ApplicationListener<Application
 			if (CollectionUtils.isNotEmpty(whiteUrlSet)) log.info("白名单列表:{}", whiteUrlSet);
 			if (CollectionUtils.isNotEmpty(blackUrlSet)) log.info("黑名单列表:{}", blackUrlSet);
 		}
-		String urls = Joiner.on(",").join(whiteUrlSet);
+		String whiteUrls = Joiner.on(",").join(whiteUrlSet);
 		String whiteUrlList = config.getWhiteUrlList();
 		if (StringUtils.isEmpty(whiteUrlList)) {
-			config.setWhiteUrlList(urls);
+			config.setWhiteUrlList(whiteUrls);
 		} else {
-			config.setWhiteUrlList(whiteUrlList + "," + urls);
+			config.setWhiteUrlList(whiteUrlList + "," + whiteUrls);
 		}
 
-		String blackUrl = Joiner.on(",").join(blackUrlSet);
+		String blackUrls = Joiner.on(",").join(blackUrlSet);
 		String blackUrlList = config.getBlackUrlList();
 		if (StringUtils.isEmpty(blackUrlList)) {
-			config.setBlackUrlList(blackUrl);
+			config.setBlackUrlList(blackUrls);
 		} else {
-			config.setBlackUrlList(blackUrlList + "," + urls);
+			config.setBlackUrlList(blackUrlList + "," + blackUrls);
 		}
 
 		AuthFilter authFilter = applicationContext.getBean(AuthFilter.class);
