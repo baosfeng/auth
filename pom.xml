@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>xyz.bsfeng</groupId>
     <artifactId>auth-spring-boot-starter</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <name>auth</name>
     <description>权限校验</description>
 

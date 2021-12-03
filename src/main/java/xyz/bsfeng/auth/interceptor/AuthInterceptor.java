@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.interceptor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
@@ -22,8 +23,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AuthInterceptor implements HandlerInterceptor {
-	AuthConfig authConfig = TokenManager.getConfig();
-
+	@Autowired
+	AuthConfig authConfig;
 
 	@Override
 	public boolean preHandle(@Nonnull HttpServletRequest request,

@@ -32,6 +32,7 @@ import static xyz.bsfeng.auth.utils.MessageUtils.sendErrorMessage;
 public class AuthFilter implements Filter {
 
 	private final Logger log = LoggerFactory.getLogger(AuthFilter.class);
+	@Autowired
 	private AuthConfig authConfig;
 	private static List<String> whiteUrlList;
 	private static List<String> blackUrlList;
@@ -45,7 +46,6 @@ public class AuthFilter implements Filter {
 	private String errorPath;
 
 	public void init() {
-		authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
 		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
 		if (StringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
