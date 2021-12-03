@@ -4,6 +4,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.PreAuthorize;
+import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.event.UserBeginRequestEvent;
 import xyz.bsfeng.auth.event.UserEndRequestFailedEvent;
@@ -21,12 +22,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AuthInterceptor implements HandlerInterceptor {
+	AuthConfig authConfig = TokenManager.getConfig();
 
 
 	@Override
 	public boolean preHandle(@Nonnull HttpServletRequest request,
 	                         @Nonnull HttpServletResponse response,
 	                         @Nonnull Object handler) throws IOException {
+		if (BooleanUtils.isFalse(authConfig.getEnable())) return true;
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
 			SpringUtils.publishEvent(new UserBeginRequestEvent(request, handlerMethod));
@@ -59,7 +62,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	                            Exception ex) throws Exception {
 		if (handler instanceof HandlerMethod) {
 			if (ex == null) {
-				SpringUtils.publishEvent(new UserEndRequestSuccessEvent(request, response, (HandlerMethod)handler));
+				SpringUtils.publishEvent(new UserEndRequestSuccessEvent(request, response, (HandlerMethod) handler));
 			} else {
 				SpringUtils.publishEvent(new UserEndRequestFailedEvent(request, response, (HandlerMethod) handler, ex));
 			}

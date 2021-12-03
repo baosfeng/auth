@@ -15,6 +15,7 @@ import xyz.bsfeng.auth.anno.IgnoreLogin;
 import xyz.bsfeng.auth.anno.MustLogin;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.interceptor.AuthFilter;
+import xyz.bsfeng.auth.utils.BooleanUtils;
 import xyz.bsfeng.auth.utils.CollectionUtils;
 import xyz.bsfeng.auth.utils.StringUtils;
 
@@ -39,6 +40,7 @@ public class ApplicationStartListener implements ApplicationListener<Application
 	@Override
 	public void onApplicationEvent(@Nonnull ApplicationReadyEvent event) {
 		AuthConfig config = TokenManager.getConfig();
+		if (BooleanUtils.isFalse(config.getEnable())) return;
 		ConfigurableApplicationContext applicationContext = event.getApplicationContext();
 		String[] restControllerAnnotations = applicationContext.getBeanNamesForAnnotation(RestController.class);
 		String[] controllerAnnotations = applicationContext.getBeanNamesForAnnotation(Controller.class);
