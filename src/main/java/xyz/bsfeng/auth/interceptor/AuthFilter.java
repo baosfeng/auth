@@ -83,6 +83,8 @@ public class AuthFilter implements Filter {
 		try {
 			token = TokenUtils.getToken();
 			userInfo = TokenUtils.getUser();
+			request.setAttribute("userInfo", userInfo);
+			request.setAttribute("userId", userInfo.getId());
 			if (authConfig.getAutoRenew()) {
 				poolExecutor.submit(() -> tokenDao.updateUserInfo(token, userInfo));
 			}

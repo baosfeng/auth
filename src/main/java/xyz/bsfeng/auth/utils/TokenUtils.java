@@ -450,8 +450,6 @@ public class TokenUtils {
 		}
 		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		checkUser(userInfo);
-		request.setAttribute("userInfo", userInfo);
-		request.setAttribute("userId", userInfo.getId());
 		// 非临时用户可放入
 		if (!(userInfo instanceof TempUser)) {
 			userCache.put(token, userInfo);
