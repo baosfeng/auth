@@ -56,4 +56,16 @@ public interface AuthConstant {
 	String TYPE_UUID = "uuid";
 	/** 临时token的前缀 */
 	String TEMP_PREFIX = "aBYY";
+	/** 当前请求保存的token请求路径 */
+	String REQUEST_READ_FROM = "readFrom";
+	/** 待取的值 */
+	String REQUEST_TOKEN_NAMES = "tokenNames";
+	/** 忽略请求的大小写 */
+	String REQUEST_IGNORE_CAMELCASE = "ignoreCamelCase";
+	/** 是否输出日志 */
+	String REQUEST_IS_LOG = "isLog";
+	String IS_WHITE_URL = "isWhiteUrl";
+	String TOKEN_NAME = "token";
+	String USER_ID = "userId";
+	String USER_INFO = "userInfo";
 }

@@ -18,7 +18,7 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.interceptor.AuthFilter;
+import xyz.bsfeng.auth.interceptor.MyFilter;
 import xyz.bsfeng.auth.interceptor.AuthInterceptor;
 import xyz.bsfeng.auth.listener.ApplicationStartListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
@@ -84,8 +84,8 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public AuthFilter authFilter() {
-		return new AuthFilter();
+	public MyFilter authFilter() {
+		return new MyFilter();
 	}
 
 	@Bean

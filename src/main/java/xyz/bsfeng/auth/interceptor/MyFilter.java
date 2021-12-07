@@ -2,6 +2,8 @@ package xyz.bsfeng.auth.interceptor;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,27 +13,28 @@ import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.TokenDao;
-import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.filter.AuthFilter;
+import xyz.bsfeng.auth.utils.BooleanUtils;
 import xyz.bsfeng.auth.utils.StringUtils;
-import xyz.bsfeng.auth.utils.TokenUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import static xyz.bsfeng.auth.utils.MessageUtils.sendErrorMessage;
 
 /**
  * @author bsfeng
  * @date 2021/9/28 11:45
  */
-public class AuthFilter implements Filter {
+public class MyFilter implements Filter {
 
-	private final Logger log = LoggerFactory.getLogger(AuthFilter.class);
+	private final Logger log = LoggerFactory.getLogger(MyFilter.class);
 	@Autowired
 	private AuthConfig authConfig;
 	private static List<String> whiteUrlList;
@@ -44,6 +47,9 @@ public class AuthFilter implements Filter {
 	private String token;
 	@Value("${error.path:/error}")
 	private String errorPath;
+	final Cache<String, Method> cache = TokenManager.cache;
+	Cache<String, Method> urlMethodCache = CacheBuilder.newBuilder().build();
+	private final ArrayList<AuthFilter> authFilters = TokenManager.getAuthFilters();
 
 	public void init() {
 		tokenDao = TokenManager.getTokenDao();
@@ -56,7 +62,10 @@ public class AuthFilter implements Filter {
 		}
 		whiteUrlList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(authConfig.getWhiteUrlList());
 		blackUrlList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(authConfig.getBlackUrlList());
-		Lists.newArrayList(whiteUrlList);
+		cache.asMap().forEach((k, v) -> {
+			if (BooleanUtils.isFalse(k.contains("*"))) urlMethodCache.put(k, v);
+			cache.invalidate(k);
+		});
 	}
 
 	@Override
@@ -67,51 +76,27 @@ public class AuthFilter implements Filter {
 		}
 		HttpServletRequest servletRequest = (HttpServletRequest) request;
 		HttpServletResponse servletResponse = (HttpServletResponse) response;
-		if (authConfig.getLog()) log.debug("正在访问{}", servletRequest.getRequestURI());
-		boolean isWhiteUrl = checkWhiteUrl(servletRequest);
-
-		if (isWhiteUrl) {
-			try {
-				chain.doFilter(request, response);
-				return;
-			} catch (AuthException e) {
-				sendErrorMessage(servletResponse, e);
-				return;
+		String uri = servletRequest.getRequestURI();
+		if (authConfig.getLog()) log.debug("正在访问{}", uri);
+		Method me = urlMethodCache.getIfPresent(uri);
+		if (me == null) {
+			for (Map.Entry<String, Method> entry : cache.asMap().entrySet()) {
+				String key = entry.getKey();
+				Method method = entry.getValue();
+				if (MATCHER.match(key,uri)) {
+					me = method;
+					break;
+				}
 			}
 		}
-		UserInfo userInfo;
-		try {
-			token = TokenUtils.getToken();
-			userInfo = TokenUtils.getUser();
-			request.setAttribute("userInfo", userInfo);
-			request.setAttribute("userId", userInfo.getId());
-			if (authConfig.getAutoRenew()) {
-				poolExecutor.submit(() -> tokenDao.updateUserInfo(token, userInfo));
-			}
-		} catch (AuthException e) {
-			sendErrorMessage(servletResponse, e);
+		if (me == null) {
+			chain.doFilter(request, response);
 			return;
+		}
+		for (AuthFilter authFilter : authFilters) {
+			authFilter.doChain(servletRequest, servletResponse, authConfig, me);
 		}
 		chain.doFilter(request, response);
 	}
 
-	public static boolean checkWhiteUrl(HttpServletRequest request) {
-		String uri = request.getRequestURI();
-		for (String url : blackUrlList) {
-			boolean match = MATCHER.match(url, uri);
-			if (match) {
-				request.setAttribute("isWhiteUrl", false);
-				return false;
-			}
-		}
-		for (String white : whiteUrlList) {
-			boolean match = MATCHER.match(white, uri);
-			if (match) {
-				request.setAttribute("isWhiteUrl", true);
-				return true;
-			}
-		}
-		request.setAttribute("isWhiteUrl", false);
-		return false;
-	}
 }
