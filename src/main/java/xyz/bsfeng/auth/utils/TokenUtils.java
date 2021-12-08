@@ -66,7 +66,11 @@ public class TokenUtils {
 		Set<String> tokenList = TokenManager.listById(userInfo.getId());
 		if (AuthCollectionUtils.isNotEmpty(tokenList)) {
 			// 返回第一个token
-			if (globalShare) return tokenList.iterator().next();
+			if (globalShare) {
+				String firstToken = tokenList.iterator().next();
+				long timeout = tokenDao.getTimeout(firstToken);
+				if (0 < timeout) return firstToken;
+			}
 		}
 		String token = getTokenKey();
 		long expireTime = userInfo.getExpireTime();

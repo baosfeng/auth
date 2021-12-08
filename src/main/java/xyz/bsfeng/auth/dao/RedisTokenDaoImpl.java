@@ -145,7 +145,7 @@ public class RedisTokenDaoImpl implements TokenDao {
 			UserInfo obj = (UserInfo) objectList.get(i);
 			if (obj == null) continue;
 			Set<String> tokenList = TokenManager.listById(obj.getId());
-			tokenList.add(tokens.get(i));
+			tokenList.add(tokens.get(i).replace(TOKEN_PREFIX, ""));
 		}
 		if (TokenManager.getConfig().getLog())
 			log.debug("更新token列表完毕!本次更新了{}条,共计{}ms!", keys.size(),
