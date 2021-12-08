@@ -30,8 +30,6 @@ public class AuthConfig {
 	/** 是否自动续签 */
 	@NonNull
 	private Boolean autoRenew = true;
-	/** 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token) */
-	private Boolean globalShare = true;
 	/** token的生成风格,全局唯一,支持random16,random32,random64,uuid,md5 */
 	@NonNull
 	private String tokenType = "random16";
@@ -113,14 +111,6 @@ public class AuthConfig {
 
 	public void setAutoRenew(@NonNull Boolean autoRenew) {
 		this.autoRenew = autoRenew;
-	}
-
-	public Boolean getGlobalShare() {
-		return globalShare;
-	}
-
-	public void setGlobalShare(Boolean globalShare) {
-		this.globalShare = globalShare;
 	}
 
 	@NonNull
@@ -214,7 +204,6 @@ public class AuthConfig {
 				", readFrom='" + readFrom + '\'' +
 				", ignoreCamelCase=" + ignoreCamelCase +
 				", autoRenew=" + autoRenew +
-				", globalShare=" + globalShare +
 				", tokenType='" + tokenType + '\'' +
 				", whiteUrlList='" + whiteUrlList + '\'' +
 				", blackUrlList='" + blackUrlList + '\'' +

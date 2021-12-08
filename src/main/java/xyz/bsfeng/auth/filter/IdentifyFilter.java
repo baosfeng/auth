@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.filter;
 
-import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Set;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
@@ -53,8 +51,5 @@ public class IdentifyFilter implements AuthFilter {
 		}
 		request.setAttribute(USER_INFO, userInfo);
 		request.setAttribute(USER_ID, userInfo.getId());
-		// 保存每个用户的token列表
-		Set<String> tokenSet = TokenManager.listById(userInfo.getId());
-		tokenSet.add(token);
 	}
 }

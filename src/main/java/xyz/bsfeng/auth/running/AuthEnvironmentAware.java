@@ -16,12 +16,10 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.exception.AuthParamException;
-import xyz.bsfeng.auth.schedule.TokenSchedule;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class AuthEnvironmentAware implements EnvironmentAware, ApplicationContextAware {
 
@@ -57,13 +55,6 @@ public class AuthEnvironmentAware implements EnvironmentAware, ApplicationContex
 		}
 		TokenManager.setTokenDao(tokenDao);
 		TokenUtils.init();
-
-		TokenSchedule tokenSchedule = applicationContext.getBean(TokenSchedule.class);
-		try {
-			tokenSchedule.refreshToken();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

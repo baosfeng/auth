@@ -9,14 +9,11 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.filter.*;
-import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class TokenManager {
 
@@ -35,7 +32,6 @@ public class TokenManager {
 			new LockFilter(),
 			new AuthRefreshFilter()
 	);
-	public static Cache<Long, Set<String>> idCache = CacheBuilder.newBuilder().build();
 
 	public static void setConfig(AuthConfig config) {
 		authConfig = config;
@@ -76,20 +72,4 @@ public class TokenManager {
 		return authFilters;
 	}
 
-	public static void removeAll() {
-		idCache.invalidateAll();
-	}
-
-	public static void removeById(Long id) {
-		idCache.invalidate(id);
-	}
-
-	public static Set<String> listById(Long id) {
-		Set<String> tokenSet = idCache.getIfPresent(id);
-		if (AuthCollectionUtils.isEmpty(tokenSet)) {
-			tokenSet = new HashSet<>();
-			idCache.put(id, tokenSet);
-		}
-		return tokenSet;
-	}
 }

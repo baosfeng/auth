@@ -1,10 +1,7 @@
 package xyz.bsfeng.auth.dao;
 
 
-import xyz.bsfeng.auth.pojo.UserModel;
-
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -70,28 +67,7 @@ public class TokenDaoDefaultImpl implements TokenDao {
 		expireMap.put(key, System.currentTimeMillis() + timeout * 1000);
 	}
 
-	@Override
-	public Map<String, UserModel> getTokenInfoMapById(Long id) {
-		return null;
-	}
-
-	@Override
-	public void deleteTokenListById(Long id) {
-
-	}
-
-	@Override
-	public void refreshTokenListById() {
-
-	}
-
-	@Override
-	public Set<String> listTokenById(Long id) {
-		return null;
-	}
-
-
-	// --------------------- 定时清理过期数据  
+	// --------------------- 定时清理过期数据
 
 	/**
 	 * 如果指定key已经过期，则立即清除它

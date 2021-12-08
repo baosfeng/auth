@@ -1,12 +1,6 @@
 package xyz.bsfeng.auth.dao;
 
 
-import xyz.bsfeng.auth.pojo.UserModel;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
 /**
  * Sa-Token持久层接口
  *
@@ -72,21 +66,5 @@ public interface TokenDao {
 	 * @param timeout 过期时间
 	 */
 	void updateTimeout(String key, long timeout);
-
-	// --------------------- 控制用户拥有的token ---------------------
-
-	/**
-	 * 根据用户的id去查询锁拥有的token数量
-	 *
-	 * @param id
-	 * @return
-	 */
-	Map<String, UserModel> getTokenInfoMapById(Long id);
-
-	void deleteTokenListById(Long id);
-
-	void refreshTokenListById() throws ExecutionException;
-
-	Set<String> listTokenById(Long id);
 
 }

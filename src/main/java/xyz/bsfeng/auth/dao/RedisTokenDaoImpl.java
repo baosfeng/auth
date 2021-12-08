@@ -1,17 +1,11 @@
 package xyz.bsfeng.auth.dao;
 
 
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
-import xyz.bsfeng.auth.pojo.UserModel;
-import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,7 +19,6 @@ public class RedisTokenDaoImpl implements TokenDao {
 	private static String TOKEN_PREFIX = "user:";
 	private static String TEMP_TOKEN_SUFFIX = ":";
 	private static String tokenPrefix;
-	private final Logger log = LoggerFactory.getLogger(RedisTokenDaoImpl.class);
 
 	public RedisTokenDaoImpl(RedisTemplate<String, Object> redisTemplate, AuthConfig authConfig) {
 		this.redisTemplate = redisTemplate;
@@ -105,56 +98,6 @@ public class RedisTokenDaoImpl implements TokenDao {
 	@Override
 	public void updateTimeout(String key, long timeout) {
 		redisTemplate.expire(getTokenKey(key), timeout, TimeUnit.SECONDS);
-	}
-
-	@Override
-	public Map<String, UserModel> getTokenInfoMapById(Long id) {
-		// 一个id对应多个token
-		String idKey = getTokenKey(id + "");
-		Map<Object, Object> entries = redisTemplate.opsForHash().entries(idKey);
-		Map<String, UserModel> newMap = new HashMap<>();
-		long currentTime = System.currentTimeMillis();
-		// 删除过期的key
-		for (Map.Entry<Object, Object> entry : entries.entrySet()) {
-			UserModel userModel = (UserModel) entry.getValue();
-			if (currentTime < userModel.getExpireTime()) {
-				newMap.put((String) entry.getKey(), userModel);
-			}
-		}
-		return newMap;
-	}
-
-	@Override
-	public void deleteTokenListById(Long id) {
-		Set<String> tokenSet = listTokenById(id);
-		if (AuthCollectionUtils.isEmpty(tokenSet)) return;
-		redisTemplate.delete(tokenSet);
-		TokenManager.removeById(id);
-	}
-
-	@Override
-	public void refreshTokenListById() {
-		long startTime = System.currentTimeMillis();
-		Set<String> keys = redisTemplate.keys(TOKEN_PREFIX + "*");
-		if (AuthCollectionUtils.isEmpty(keys)) return;
-		ArrayList<String> tokens = Lists.newArrayList(keys);
-		List<Object> objectList = redisTemplate.opsForValue().multiGet(tokens);
-		if (AuthCollectionUtils.isEmpty(objectList)) return;
-		TokenManager.removeAll();
-		for (int i = 0; i < objectList.size(); i++) {
-			UserInfo obj = (UserInfo) objectList.get(i);
-			if (obj == null) continue;
-			Set<String> tokenList = TokenManager.listById(obj.getId());
-			tokenList.add(tokens.get(i).replace(TOKEN_PREFIX, ""));
-		}
-		if (TokenManager.getConfig().getLog())
-			log.debug("更新token列表完毕!本次更新了{}条,共计{}ms!", keys.size(),
-					System.currentTimeMillis() - startTime);
-	}
-
-	@Override
-	public Set<String> listTokenById(Long id) {
-		return TokenManager.listById(id);
 	}
 
 	private String getTokenKey(String key) {

@@ -38,18 +38,6 @@ public class HelloController {
 		return id;
 	}
 
-	@GetMapping("/kickOut")
-	public String kickOut() {
-		TokenUtils.kickOut();
-		return "踢出成功";
-	}
-
-	@GetMapping("/lock")
-	public String lock() {
-		TokenUtils.lock(TokenUtils.getId(), 100L);
-		return "封禁成功";
-	}
-
 	@PreAuthorize(hasRole = "all")
 	@GetMapping("/role/check")
 	public Long getRole() {

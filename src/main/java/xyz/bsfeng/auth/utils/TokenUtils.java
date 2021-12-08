@@ -9,15 +9,15 @@ import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.event.*;
+import xyz.bsfeng.auth.event.UserLoginEvent;
+import xyz.bsfeng.auth.event.UserLogoutEvent;
+import xyz.bsfeng.auth.event.UserTokenKickOutEvent;
+import xyz.bsfeng.auth.event.UserTokenLockEvent;
 import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthUser;
-import xyz.bsfeng.auth.pojo.UserModel;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
@@ -29,7 +29,6 @@ public class TokenUtils {
 	private static TokenDao tokenDao;
 
 	private static long timeout;
-	private static Boolean globalShare;
 	private static String tokenType;
 	private static String tokenPrefix;
 	private static Boolean enable;
@@ -41,7 +40,6 @@ public class TokenUtils {
 	public static void init() {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
-		globalShare = authConfig.getGlobalShare();
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType().toLowerCase();
 		tokenPrefix = authConfig.getTokenPrefix();
@@ -63,15 +61,6 @@ public class TokenUtils {
 			throw new AuthException(414, "权限框架未启动!");
 		}
 		if (userInfo.getId() == null) throw new AuthException(415, "用户id不能为空!");
-		Set<String> tokenList = TokenManager.listById(userInfo.getId());
-		if (AuthCollectionUtils.isNotEmpty(tokenList)) {
-			// 返回第一个token
-			if (globalShare) {
-				String firstToken = tokenList.iterator().next();
-				long timeout = tokenDao.getTimeout(firstToken);
-				if (0 < timeout) return firstToken;
-			}
-		}
 		String token = getTokenKey();
 		long expireTime = userInfo.getExpireTime();
 		if (userInfo.getExpireTime() == null || userInfo.getExpireTime() == 0) {
@@ -137,20 +126,6 @@ public class TokenUtils {
 	}
 
 	/**
-	 * 踢出当前的所有登录，所有token全部失效,注意账户被封禁无法正常退出
-	 */
-	public static void kickOut() {
-		Long id = getId();
-		Set<String> tokenSet = tokenDao.listTokenById(id);
-		for (String token : tokenSet) {
-			kickOut(token);
-		}
-		tokenDao.deleteTokenListById(id);
-		if (isLog) log.info("正在踢出{}的用户所有token", id);
-		AuthSpringUtils.publishEvent(new UserKickOutEvent(id));
-	}
-
-	/**
 	 * 根据指定的token进行踢出用户
 	 *
 	 * @param token 当前正在使用的token
@@ -164,33 +139,6 @@ public class TokenUtils {
 		tokenDao.deleteUserInfo(token);
 		if (isLog) log.debug("正在踢出{}的用户", token);
 		AuthSpringUtils.publishEvent(new UserTokenKickOutEvent(user, token));
-	}
-
-	/**
-	 * 封禁指定id的用户,且封禁所有token,如果已经封禁了,那么将会是本次封禁起效果
-	 *
-	 * @param id       用户id
-	 * @param lockTime 封禁时间
-	 */
-	public static void lock(long id, long lockTime) {
-		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
-		if (AuthCollectionUtils.isEmpty(tokenInfoMap)) {
-			// 未登录的用户将自动帮他进行登录
-			if (TokenManager.getConfig().getKickOutIgnoreLogin()) {
-				AuthUser authUser = new AuthUser(id);
-				login(authUser);
-				lock(id, lockTime);
-				return;
-			}
-		}
-		Set<String> tokenList = tokenInfoMap.keySet();
-		if (AuthCollectionUtils.isNotEmpty(tokenList)) {
-			for (String token : tokenList) {
-				lock(token, lockTime);
-			}
-		}
-		if (isLog) log.info("封禁id为{}时间{}秒", id, lockTime);
-		AuthSpringUtils.publishEvent(new UserLockEvent(id, lockTime));
 	}
 
 	/**

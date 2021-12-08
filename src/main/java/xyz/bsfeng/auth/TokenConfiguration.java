@@ -19,9 +19,7 @@ import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.filter.MyFilter;
 import xyz.bsfeng.auth.listener.UrlMethodListener;
-import xyz.bsfeng.auth.listener.UserLoginListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
-import xyz.bsfeng.auth.schedule.TokenSchedule;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import javax.annotation.Nonnull;
@@ -87,16 +85,6 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	@Bean
 	public UrlMethodListener urlMethodListener() {
 		return new UrlMethodListener();
-	}
-
-	@Bean
-	public UserLoginListener userLoginListener() {
-		return new UserLoginListener();
-	}
-
-	@Bean
-	public TokenSchedule tokenSchedule() {
-		return new TokenSchedule();
 	}
 
 	@Bean("authThreadPool")
