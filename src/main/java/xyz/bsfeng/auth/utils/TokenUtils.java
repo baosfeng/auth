@@ -94,12 +94,12 @@ public class TokenUtils {
 	 * @return 登录token
 	 */
 	public static String login(AuthUser userInfo, AuthLoginModel loginModel) {
-		if (BooleanUtils.isFalse(enable)) {
+		if (AuthBooleanUtils.isFalse(enable)) {
 			throw new AuthException(414, "权限框架未启动!");
 		}
 		Long id = userInfo.getId();
 		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
-		if (CollectionUtils.isNotEmpty(tokenInfoMap)) {
+		if (AuthCollectionUtils.isNotEmpty(tokenInfoMap)) {
 			// 处理账号封禁情况
 			for (String token : tokenInfoMap.keySet()) {
 				UserInfo user = userCache.getIfPresent(token);
@@ -110,12 +110,12 @@ public class TokenUtils {
 			}
 		}
 		// 处理全局共享token
-		if (TokenManager.getConfig().getGlobalShare() && CollectionUtils.isNotEmpty(tokenInfoMap)) {
+		if (TokenManager.getConfig().getGlobalShare() && AuthCollectionUtils.isNotEmpty(tokenInfoMap)) {
 			return processGlobalShare(userInfo, tokenInfoMap);
 		}
 		String token = getTokenKey();
 		tokenDao.setUserInfo(token, userInfo, timeout);
-		if (CollectionUtils.isEmpty(tokenInfoMap)) {
+		if (AuthCollectionUtils.isEmpty(tokenInfoMap)) {
 			tokenInfoMap = new HashMap<>(4);
 		}
 		// 设置是否允许多端登录
@@ -134,7 +134,7 @@ public class TokenUtils {
 				.setExpireTime(System.currentTimeMillis() + ONE_DAY);
 		tokenInfoMap.put(token, userModel);
 		tokenDao.setTokenInfoMapById(id, tokenInfoMap);
-		SpringUtils.publishEvent(new UserLoginEvent(userInfo, userModel));
+		AuthSpringUtils.publishEvent(new UserLoginEvent(userInfo, userModel));
 		if (isLog) log.info("登录成功,当前登录用户为:{}", userInfo);
 		return token;
 	}
@@ -152,7 +152,7 @@ public class TokenUtils {
 	 * @return 登录token
 	 */
 	public static String loginTemp(TempUser authUser, Long expireTime, String field) {
-		if (BooleanUtils.isFalse(enable)) {
+		if (AuthBooleanUtils.isFalse(enable)) {
 			throw new AuthException(414, "权限框架未启动!");
 		}
 		Long id = authUser.getId();
@@ -160,7 +160,7 @@ public class TokenUtils {
 			authUser.setId(-2L);
 		}
 		String token;
-		if (StringUtils.isNotEmpty(field)) {
+		if (AuthStringUtils.isNotEmpty(field)) {
 			token = DigestUtils.md5DigestAsHex(field.getBytes(StandardCharsets.UTF_8));
 		} else {
 			token = getTokenKey();
@@ -169,7 +169,7 @@ public class TokenUtils {
 		}
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		if (isLog) log.info("登录成功,当前登录用户为:{}", authUser);
-		SpringUtils.publishEvent(new UserLoginEvent(authUser, null));
+		AuthSpringUtils.publishEvent(new UserLoginEvent(authUser, null));
 		return token;
 	}
 
@@ -203,7 +203,7 @@ public class TokenUtils {
 	public static void logout() {
 		String token = getToken();
 		kickOut(token);
-		SpringUtils.publishEvent(new UserLogoutEvent(token));
+		AuthSpringUtils.publishEvent(new UserLogoutEvent(token));
 	}
 
 	/**
@@ -217,7 +217,7 @@ public class TokenUtils {
 		}
 		tokenDao.deleteTokenListById(id);
 		if (isLog) log.info("正在踢出{}的用户所有token", id);
-		SpringUtils.publishEvent(new UserKickOutEvent(id));
+		AuthSpringUtils.publishEvent(new UserKickOutEvent(id));
 	}
 
 	/**
@@ -226,7 +226,7 @@ public class TokenUtils {
 	 * @param token 当前正在使用的token
 	 */
 	public static void kickOut(String token) {
-		if (StringUtils.isEmpty(token)) {
+		if (AuthStringUtils.isEmpty(token)) {
 			throw new AuthException(KICK_OUT_TOKEN_EMPTY_CODE, KICK_OUT_TOKEN_EMPTY_MESSAGE);
 		}
 		// 更新用户拥有的token集合
@@ -239,17 +239,17 @@ public class TokenUtils {
 		checkUser(user);
 		Long id = user.getId();
 		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
-		if (CollectionUtils.isNotEmpty(tokenInfoMap)) {
+		if (AuthCollectionUtils.isNotEmpty(tokenInfoMap)) {
 			tokenInfoMap.remove(token);
 			// 如果删除之后仅剩一个,那么删除
-			if (CollectionUtils.isEmpty(tokenInfoMap)) {
+			if (AuthCollectionUtils.isEmpty(tokenInfoMap)) {
 				tokenDao.deleteTokenListById(id);
 			}
 		}
 		tokenDao.deleteUserInfo(token);
 		userCache.invalidate(token);
 		if (isLog) log.debug("正在踢出{}的用户", token);
-		SpringUtils.publishEvent(new UserTokenKickOutEvent(user, token));
+		AuthSpringUtils.publishEvent(new UserTokenKickOutEvent(user, token));
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class TokenUtils {
 	 */
 	public static void lock(long id, long lockTime) {
 		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
-		if (CollectionUtils.isEmpty(tokenInfoMap)) {
+		if (AuthCollectionUtils.isEmpty(tokenInfoMap)) {
 			// 未登录的用户将自动帮他进行登录
 			if (TokenManager.getConfig().getKickOutIgnoreLogin()) {
 				AuthUser authUser = new AuthUser(id);
@@ -270,13 +270,13 @@ public class TokenUtils {
 			}
 		}
 		Set<String> tokenList = tokenInfoMap.keySet();
-		if (CollectionUtils.isNotEmpty(tokenList)) {
+		if (AuthCollectionUtils.isNotEmpty(tokenList)) {
 			for (String token : tokenList) {
 				lock(token, lockTime);
 			}
 		}
 		if (isLog) log.info("封禁id为{}时间{}秒", id, lockTime);
-		SpringUtils.publishEvent(new UserLockEvent(id, lockTime));
+		AuthSpringUtils.publishEvent(new UserLockEvent(id, lockTime));
 	}
 
 	/**
@@ -298,11 +298,11 @@ public class TokenUtils {
 		user.setLockTime(lockTime * 1000 + System.currentTimeMillis());
 		tokenDao.updateUserInfo(token, user);
 		userCache.put(token, user);
-		SpringUtils.publishEvent(new UserTokenLockEvent(token, lockTime));
+		AuthSpringUtils.publishEvent(new UserTokenLockEvent(token, lockTime));
 	}
 
 	public static Long getId() {
-		HttpServletRequest request = SpringMVCUtil.getRequest();
+		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
 		Object id = request.getAttribute("userId");
 		if (id != null) {
 			return (Long) id;
@@ -317,7 +317,7 @@ public class TokenUtils {
 
 
 	public static String getToken() {
-		HttpServletRequest servletRequest = SpringMVCUtil.getRequest();
+		HttpServletRequest servletRequest = AuthSpringMVCUtil.getRequest();
 		Object attribute = servletRequest.getAttribute("token");
 		if (attribute != null) return (String) attribute;
 		String token = "";
@@ -325,7 +325,7 @@ public class TokenUtils {
 		String currentTokenName = "";
 		for (String from : readFrom) {
 			for (String tokenName : tokenNames) {
-				if (StringUtils.isNotEmpty(token)) break;
+				if (AuthStringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:
 						currentTokenName = tokenName;
@@ -339,12 +339,12 @@ public class TokenUtils {
 						throw new AuthException(AuthConstant.TYPE_NOT_SUPPORT_CODE, AuthConstant.TYPE_NOT_SUPPORT_MESSAGE);
 				}
 			}
-			if (StringUtils.isNotEmpty(token)) {
+			if (AuthStringUtils.isNotEmpty(token)) {
 				tokenFrom = from;
 				break;
 			}
 		}
-		if (StringUtils.isEmpty(token)) {
+		if (AuthStringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得" + Arrays.toString(tokenNames) + "信息,请检查token名称是否正确");
 		}
 		if (isLog) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
@@ -389,16 +389,16 @@ public class TokenUtils {
 		String token;
 		switch (tokenType) {
 			case AuthConstant.TYPE_RANDOM16:
-				token = StringUtils.randomString(16);
+				token = AuthStringUtils.randomString(16);
 				break;
 			case AuthConstant.TYPE_RANDOM32:
-				token = StringUtils.randomString(32);
+				token = AuthStringUtils.randomString(32);
 				break;
 			case AuthConstant.TYPE_RANDOM64:
-				token = StringUtils.randomString(64);
+				token = AuthStringUtils.randomString(64);
 				break;
 			case AuthConstant.TYPE_MD5:
-				token = DigestUtils.md5DigestAsHex(StringUtils.randomString(20).getBytes(StandardCharsets.UTF_8));
+				token = DigestUtils.md5DigestAsHex(AuthStringUtils.randomString(20).getBytes(StandardCharsets.UTF_8));
 				break;
 			case AuthConstant.TYPE_UUID:
 				token = UUID.randomUUID().toString().replaceAll("-", "");
@@ -420,14 +420,14 @@ public class TokenUtils {
 	 */
 	private static UserInfo getUserInfo() {
 		// 如果未设置权限框架
-		if (BooleanUtils.isFalse(enable)) {
+		if (AuthBooleanUtils.isFalse(enable)) {
 			return new AuthUser(-3L);
 		}
-		HttpServletRequest request = SpringMVCUtil.getRequest();
+		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
 		Object attribute = request.getAttribute("userInfo");
 		if (attribute != null) {
 			UserInfo userInfo = (UserInfo) attribute;
-			if (BooleanUtils.isFalse(TokenManager.getConfig().getAllowSampleDeviceLogin())) {
+			if (AuthBooleanUtils.isFalse(TokenManager.getConfig().getAllowSampleDeviceLogin())) {
 				checkUser(userInfo);
 			}
 			return userInfo;
@@ -462,7 +462,7 @@ public class TokenUtils {
 		if (userInfo == null) {
 			throw new AuthException(AuthConstant.NOT_LOGIN_CODE, AuthConstant.NOT_LOGIN_MESSAGE);
 		}
-		HttpServletRequest request = SpringMVCUtil.getRequest();
+		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
 		Object obj = request.getAttribute("token");
 		if (obj == null) return;
 		String token = (String) obj;
@@ -472,11 +472,11 @@ public class TokenUtils {
 			if (userModel != null) idCache.put(token, userModel);
 		}
 		// 检查是否被封禁
-		if (BooleanUtils.isTrue(userInfo.getLock())) {
+		if (AuthBooleanUtils.isTrue(userInfo.getLock())) {
 			long millis = System.currentTimeMillis();
 			if (millis < userInfo.getLockTime()) {
 				long lessTime = userInfo.getLockTime() - millis;
-				throw new AuthException(ACCOUNT_LOCK_CODE, ACCOUNT_LOCK_MESSAGE + TimeUtils.mill2Time(lessTime));
+				throw new AuthException(ACCOUNT_LOCK_CODE, ACCOUNT_LOCK_MESSAGE + AuthTimeUtils.mill2Time(lessTime));
 			}
 			// 如果已经过了锁定时间,那么解封用户
 			userInfo.setLock(false);
@@ -486,7 +486,7 @@ public class TokenUtils {
 		}
 		// 检查是否被挤下线
 		if (userModel != null && userModel.getOfflineTime() != null) {
-			throw new AuthException(413, "当前登录的用户在" + TimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
+			throw new AuthException(413, "当前登录的用户在" + AuthTimeUtils.longToTime(userModel.getOfflineTime()) + "被另一台设备挤下线!");
 		}
 	}
 
@@ -504,7 +504,7 @@ public class TokenUtils {
 		long currentTime = System.currentTimeMillis();
 		tokenInfoMap.forEach((key, value) -> value.setExpireTime(currentTime + ONE_DAY));
 		tokenDao.setTokenInfoMapById(userInfo.getId(), tokenInfoMap);
-		SpringUtils.publishEvent(new UserLoginEvent(userInfo, null));
+		AuthSpringUtils.publishEvent(new UserLoginEvent(userInfo, null));
 		return token;
 	}
 }

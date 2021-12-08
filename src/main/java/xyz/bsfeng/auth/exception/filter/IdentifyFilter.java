@@ -6,8 +6,8 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.BooleanUtils;
-import xyz.bsfeng.auth.utils.SpringUtils;
+import xyz.bsfeng.auth.utils.AuthBooleanUtils;
+import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +29,7 @@ public class IdentifyFilter implements AuthFilter {
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nonnull Method method) {
-		if (BooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) {
+		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) {
 			request.setAttribute(USER_ID, -2L);
 			return;
 		}
@@ -39,7 +39,7 @@ public class IdentifyFilter implements AuthFilter {
 			request.setAttribute(USER_ID, -1L);
 			return;
 		}
-		TokenDao tokenDao = SpringUtils.getClass(RedisTokenDaoImpl.class);
+		TokenDao tokenDao = AuthSpringUtils.getClass(RedisTokenDaoImpl.class);
 		UserInfo userInfo = (UserInfo) tokenDao.getUserInfo(token);
 		// 校验是否登录
 		if (userInfo == null) {

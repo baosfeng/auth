@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.BooleanUtils;
-import xyz.bsfeng.auth.utils.StringUtils;
+import xyz.bsfeng.auth.utils.AuthBooleanUtils;
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ public class TokenFilter implements AuthFilter {
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nonnull Method method) {
-		if (BooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) return;
+		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) return;
 		String token = "";
 		String tokenFrom = "";
 		String currentTokenName = "";
@@ -40,7 +40,7 @@ public class TokenFilter implements AuthFilter {
 		String[] tokenNames = authConfig.getTokenName().split(",");
 		for (String from : authConfig.getReadFrom().split(",")) {
 			for (String tokenName : authConfig.getTokenName().split(",")) {
-				if (StringUtils.isNotEmpty(token)) break;
+				if (AuthStringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:
 						currentTokenName = tokenName;
@@ -54,12 +54,12 @@ public class TokenFilter implements AuthFilter {
 						throw new AuthException(AuthConstant.TYPE_NOT_SUPPORT_CODE, AuthConstant.TYPE_NOT_SUPPORT_MESSAGE);
 				}
 			}
-			if (StringUtils.isNotEmpty(token)) {
+			if (AuthStringUtils.isNotEmpty(token)) {
 				tokenFrom = from;
 				break;
 			}
 		}
-		if (StringUtils.isEmpty(token)) {
+		if (AuthStringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得" + Arrays.toString(tokenNames) + "信息,请检查token名称是否正确");
 		}
 		if (authConfig.getLog()) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);

@@ -20,7 +20,7 @@ import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.interceptor.MyFilter;
 import xyz.bsfeng.auth.listener.UrlMethodListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
-import xyz.bsfeng.auth.utils.SpringUtils;
+import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -67,8 +67,8 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SpringUtils springUtils() {
-		return new SpringUtils();
+	public AuthSpringUtils springUtils() {
+		return new AuthSpringUtils();
 	}
 
 	@Bean

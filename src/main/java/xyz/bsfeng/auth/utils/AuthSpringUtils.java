@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent;
 
 import javax.annotation.Nonnull;
 
-public class SpringUtils implements ApplicationContextAware {
+public class AuthSpringUtils implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 

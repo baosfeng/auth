@@ -3,7 +3,7 @@ package xyz.bsfeng.auth.utils;
 
 import java.util.Random;
 
-public class StringUtils {
+public class AuthStringUtils {
 
 	private static final String randomStr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	private static final Random random = new Random();

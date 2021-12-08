@@ -5,8 +5,8 @@ import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.CollectionUtils;
-import xyz.bsfeng.auth.utils.StringUtils;
+import xyz.bsfeng.auth.utils.AuthCollectionUtils;
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
 import javax.annotation.Nonnull;
@@ -33,8 +33,8 @@ public class AuthorityFilter implements AuthFilter {
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
 		String[] auths = annotation.hasAuth();
-		Set<String> authSet = Arrays.stream(auths).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-		if (CollectionUtils.isNotEmpty(authSet)) {
+		Set<String> authSet = Arrays.stream(auths).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
+		if (AuthCollectionUtils.isNotEmpty(authSet)) {
 			String[] userAuths = TokenUtils.getUser().getAuths();
 			if (userAuths == null) {
 				throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * @author bsfeng
  * @date 2021/8/26 14:31
  */
-public class ReflectUtils {
+public class AuthReflectUtils {
 
 	public static <T> HashSet<Field> getFields(Class<T> clazz) {
 		Field[] declaredFields = clazz.getDeclaredFields();

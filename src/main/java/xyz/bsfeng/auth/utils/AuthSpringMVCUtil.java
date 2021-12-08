@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author bsfeng
  */
-public class SpringMVCUtil {
+public class AuthSpringMVCUtil {
 
 	/**
 	 * 获取当前会话的 request

@@ -12,7 +12,7 @@ import java.util.HashMap;
  * @author bsfeng
  * @date 2021/10/15 14:57
  */
-public class MessageUtils {
+public class AuthMessageUtils {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 

@@ -7,7 +7,7 @@ import java.util.Map;
  * @author bsfeng
  * @date 2021/9/1 16:28
  */
-public class CollectionUtils {
+public class AuthCollectionUtils {
 	public static boolean isEmpty(Collection<?> collection) {
 		return collection == null || collection.isEmpty();
 	}

@@ -11,7 +11,7 @@ import java.util.Date;
  * @date 2021/8/15 15:37
  * @since 1.0.0
  */
-public class TimeUtils {
+public class AuthTimeUtils {
 
 	public static Long ONE_SECOND = 1L;
 	public static Long ONE_MINUTE = 60L;

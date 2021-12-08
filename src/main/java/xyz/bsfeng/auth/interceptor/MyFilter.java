@@ -11,7 +11,7 @@ import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.exception.filter.AuthFilter;
-import xyz.bsfeng.auth.utils.StringUtils;
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class MyFilter implements Filter {
 
 	public void init() {
 		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
-		if (StringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
+		if (AuthStringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
 			String s = authConfig.getWhiteUrlList() + "," + join;
 			authConfig.setWhiteUrlList(s);
 		} else {

@@ -3,8 +3,8 @@ package xyz.bsfeng.auth.exception.filter;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.utils.BooleanUtils;
-import xyz.bsfeng.auth.utils.SpringUtils;
+import xyz.bsfeng.auth.utils.AuthBooleanUtils;
+import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -25,13 +25,13 @@ public class AuthRefreshFilter implements AuthFilter {
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nonnull Method method) {
-		if (BooleanUtils.isFalse(authConfig.getAutoRenew())) return;
+		if (AuthBooleanUtils.isFalse(authConfig.getAutoRenew())) return;
 		String token = (String) request.getAttribute(TOKEN_NAME);
 		Long userId = (Long) request.getAttribute(USER_ID);
 		if (userId <= 0) return;
 		// 执行异步更新
-		ThreadPoolExecutor executor = SpringUtils.getClass(ThreadPoolExecutor.class);
-		TokenDao tokenDao = SpringUtils.getClass(TokenDao.class);
+		ThreadPoolExecutor executor = AuthSpringUtils.getClass(ThreadPoolExecutor.class);
+		TokenDao tokenDao = AuthSpringUtils.getClass(TokenDao.class);
 		executor.submit(() -> tokenDao.updateUserInfo(token, (UserInfo) request.getAttribute(USER_INFO)));
 	}
 }

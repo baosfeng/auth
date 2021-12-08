@@ -9,7 +9,7 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.exception.filter.*;
-import xyz.bsfeng.auth.utils.SpringUtils;
+import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class TokenManager {
 	public static AuthConfig getConfig() {
 		if (authConfig == null) {
 			synchronized (TokenManager.class) {
-				authConfig = SpringUtils.getClass(AuthConfig.class);
+				authConfig = AuthSpringUtils.getClass(AuthConfig.class);
 			}
 		}
 		return authConfig;
@@ -53,9 +53,9 @@ public class TokenManager {
 		if (tokenDao == null) {
 			synchronized (TokenManager.class) {
 				try {
-					tokenDao = SpringUtils.getClass(RedisTokenDaoImpl.class);
+					tokenDao = AuthSpringUtils.getClass(RedisTokenDaoImpl.class);
 				} catch (NoSuchBeanDefinitionException e) {
-					tokenDao = SpringUtils.getClass(TokenDaoDefaultImpl.class);
+					tokenDao = AuthSpringUtils.getClass(TokenDaoDefaultImpl.class);
 				}
 			}
 		}
