@@ -29,6 +29,7 @@ public class TokenUtils {
 	private static TokenDao tokenDao;
 
 	private static long timeout;
+	private static Boolean globalShare;
 	private static String tokenType;
 	private static String tokenPrefix;
 	private static Boolean enable;
@@ -40,7 +41,7 @@ public class TokenUtils {
 	public static void init() {
 		AuthConfig authConfig = TokenManager.getConfig();
 		tokenDao = TokenManager.getTokenDao();
-
+		globalShare = authConfig.getGlobalShare();
 		timeout = authConfig.getTimeout();
 		tokenType = authConfig.getTokenType().toLowerCase();
 		tokenPrefix = authConfig.getTokenPrefix();
@@ -61,14 +62,20 @@ public class TokenUtils {
 		if (AuthBooleanUtils.isFalse(enable)) {
 			throw new AuthException(414, "权限框架未启动!");
 		}
+		if (userInfo.getId() == null) throw new AuthException(415, "用户id不能为空!");
+		Set<String> tokenList = TokenManager.listById(userInfo.getId());
+		if (AuthCollectionUtils.isNotEmpty(tokenList)) {
+			// 返回第一个token
+			if (globalShare) return tokenList.iterator().next();
+		}
 		String token = getTokenKey();
 		long expireTime = userInfo.getExpireTime();
 		if (userInfo.getExpireTime() == null || userInfo.getExpireTime() == 0) {
 			expireTime = timeout;
 		}
 		tokenDao.setUserInfo(token, userInfo, expireTime);
-		AuthSpringUtils.publishEvent(new UserLoginEvent(userInfo));
 		if (isLog) log.info("登录成功,当前登录用户为:{}", userInfo);
+		AuthSpringUtils.publishEvent(new UserLoginEvent(userInfo, token));
 		return token;
 	}
 
@@ -88,7 +95,7 @@ public class TokenUtils {
 		token = tokenPrefix + TEMP_PREFIX + token;
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		if (isLog) log.info("登录成功,当前登录用户为:{}", authUser);
-		AuthSpringUtils.publishEvent(new UserLoginEvent(authUser));
+		AuthSpringUtils.publishEvent(new UserLoginEvent(authUser, token));
 		return token;
 	}
 
@@ -130,8 +137,8 @@ public class TokenUtils {
 	 */
 	public static void kickOut() {
 		Long id = getId();
-		Map<String, UserModel> tokenInfoMap = tokenDao.getTokenInfoMapById(id);
-		for (String token : tokenInfoMap.keySet()) {
+		Set<String> tokenSet = tokenDao.listTokenById(id);
+		for (String token : tokenSet) {
 			kickOut(token);
 		}
 		tokenDao.deleteTokenListById(id);
@@ -258,8 +265,6 @@ public class TokenUtils {
 			return new AuthUser(-3L);
 		}
 		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
-		Long userId = getId();
-		if (userId <= 0) return new AuthUser(userId);
 		return (UserInfo) request.getAttribute(USER_INFO);
 	}
 

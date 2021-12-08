@@ -19,9 +19,12 @@ import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.filter.MyFilter;
 import xyz.bsfeng.auth.listener.UrlMethodListener;
+import xyz.bsfeng.auth.listener.UserLoginListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
+import xyz.bsfeng.auth.schedule.TokenSchedule;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -86,6 +89,16 @@ public class TokenConfiguration implements WebMvcConfigurer {
 		return new UrlMethodListener();
 	}
 
+	@Bean
+	public UserLoginListener userLoginListener() {
+		return new UserLoginListener();
+	}
+
+	@Bean
+	public TokenSchedule tokenSchedule() {
+		return new TokenSchedule();
+	}
+
 	@Bean("authThreadPool")
 	@Qualifier("authThreadPool")
 	@ConditionalOnMissingBean(ThreadPoolExecutor.class)
@@ -102,7 +115,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 			private final AtomicInteger atomicInteger = new AtomicInteger();
 
 			@Override
-			public Thread newThread(Runnable r) {
+			public Thread newThread(@Nonnull Runnable r) {
 				String threadName = "auth_" + atomicInteger.getAndIncrement() + "";
 				return new Thread(null, r, threadName, 0);
 			}

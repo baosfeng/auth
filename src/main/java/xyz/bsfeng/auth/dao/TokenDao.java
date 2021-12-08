@@ -4,6 +4,8 @@ package xyz.bsfeng.auth.dao;
 import xyz.bsfeng.auth.pojo.UserModel;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Sa-Token持久层接口
@@ -81,22 +83,10 @@ public interface TokenDao {
 	 */
 	Map<String, UserModel> getTokenInfoMapById(Long id);
 
-	/**
-	 * 设置用户拥有的token集合
-	 *
-	 * @param id 用户id
-	 * @param tokenMap token为key,UserModel为value
-	 */
-	void setTokenInfoMapById(Long id, Map<String, UserModel> tokenMap);
-
-	/**
-	 * 根据用户id和token查询指定的用户信息
-	 * @param id 用户id
-	 * @param token 当前用户token
-	 * @return
-	 */
-	UserModel getTokenInfoByToken(Long id, String token);
-
 	void deleteTokenListById(Long id);
+
+	void refreshTokenListById() throws ExecutionException;
+
+	Set<String> listTokenById(Long id);
 
 }

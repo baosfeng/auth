@@ -56,10 +56,18 @@ public interface AuthConstant {
 	String TYPE_UUID = "uuid";
 	/** 临时token的前缀 */
 	String TEMP_PREFIX = "aBYY";
+	/** 是否为白名单url */
 	String IS_WHITE_URL = "isWhiteUrl";
+	/** token名称 */
 	String TOKEN_NAME = "token";
+	/** 用户id */
 	String USER_ID = "userId";
+	/** 用户信息 */
 	String USER_INFO = "userInfo";
+	/** 白名单url用户id */
 	Long WHITE_ID = -1L;
+	/** 白名单token 用户id */
+	Long WHITE_TOKEN_ID = -3L;
+	/** 临时身份用户id,如果未设置id */
 	Long TEMP_ID = -2L;
 }

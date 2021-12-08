@@ -9,13 +9,19 @@ import xyz.bsfeng.auth.dao.UserInfo;
  */
 public class UserLoginEvent extends ApplicationEvent {
 
+	private final String token;
+
 	/**
 	 * 用户登录事件
 	 *
 	 * @param userInfo
 	 */
-	public UserLoginEvent(UserInfo userInfo) {
+	public UserLoginEvent(UserInfo userInfo, String token) {
 		super(userInfo);
+		this.token = token;
 	}
 
+	public String getToken() {
+		return token;
+	}
 }

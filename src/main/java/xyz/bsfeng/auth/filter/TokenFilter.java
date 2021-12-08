@@ -40,6 +40,7 @@ public class TokenFilter implements AuthFilter {
 		String[] tokenNames = authConfig.getTokenName().split(",");
 		for (String from : authConfig.getReadFrom().split(",")) {
 			for (String tokenName : authConfig.getTokenName().split(",")) {
+				tokenName = tokenName.replaceAll("-", "").trim();
 				if (AuthStringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:

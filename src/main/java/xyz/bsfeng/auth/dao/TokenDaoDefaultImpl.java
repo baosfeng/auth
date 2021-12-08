@@ -4,6 +4,7 @@ package xyz.bsfeng.auth.dao;
 import xyz.bsfeng.auth.pojo.UserModel;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -75,18 +76,18 @@ public class TokenDaoDefaultImpl implements TokenDao {
 	}
 
 	@Override
-	public void setTokenInfoMapById(Long id, Map<String, UserModel> tokenMap) {
-
-	}
-
-	@Override
-	public UserModel getTokenInfoByToken(Long id, String token) {
-		return null;
-	}
-
-	@Override
 	public void deleteTokenListById(Long id) {
 
+	}
+
+	@Override
+	public void refreshTokenListById() {
+
+	}
+
+	@Override
+	public Set<String> listTokenById(Long id) {
+		return null;
 	}
 
 

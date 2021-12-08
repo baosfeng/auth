@@ -41,12 +41,14 @@ public class WhiteUrlFilter implements AuthFilter {
 			boolean match = MATCHER.match(url, uri);
 			if (match) {
 				request.setAttribute(IS_WHITE_URL, false);
+				return;
 			}
 		}
 		for (String white : whiteUrlList) {
 			boolean match = MATCHER.match(white, uri);
 			if (match) {
 				request.setAttribute(IS_WHITE_URL, true);
+				return;
 			}
 		}
 		request.setAttribute(IS_WHITE_URL, false);

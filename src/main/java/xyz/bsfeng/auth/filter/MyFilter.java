@@ -65,7 +65,7 @@ public class MyFilter implements Filter {
 			for (Map.Entry<String, Method> entry : cache.asMap().entrySet()) {
 				String key = entry.getKey();
 				Method method = entry.getValue();
-				if (MATCHER.match(key,uri)) {
+				if (MATCHER.match(key, uri)) {
 					me = method;
 					break;
 				}
@@ -75,12 +75,13 @@ public class MyFilter implements Filter {
 			chain.doFilter(request, response);
 			return;
 		}
-		for (AuthFilter authFilter : authFilters) {
-			try {
+		try {
+			for (AuthFilter authFilter : authFilters) {
 				authFilter.doChain(servletRequest, servletResponse, authConfig, me);
-			} catch (AuthException e) {
-				AuthMessageUtils.sendErrorMessage(servletResponse, e);
 			}
+		} catch (AuthException e) {
+			AuthMessageUtils.sendErrorMessage(servletResponse, e);
+			return;
 		}
 		chain.doFilter(request, response);
 	}
