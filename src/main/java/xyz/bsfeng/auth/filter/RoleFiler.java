@@ -5,6 +5,7 @@ import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 import xyz.bsfeng.auth.utils.AuthStringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
@@ -17,6 +18,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static xyz.bsfeng.auth.constant.AuthConstant.IS_WHITE_TOKEN;
 
 /**
  * @author Administrator
@@ -32,6 +35,10 @@ public class RoleFiler implements AuthFilter {
 	                    @Nonnull Method method) {
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
+		Boolean isWhiteToken = (Boolean) request.getAttribute(IS_WHITE_TOKEN);
+		if (AuthBooleanUtils.isTrue(isWhiteToken) && authConfig.getWhiteTokenAsAdmin()) {
+			return;
+		}
 		String[] roles = annotation.hasRole();
 		Set<String> roleSet = Arrays.stream(roles).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
 		if (AuthCollectionUtils.isNotEmpty(roleSet)) {

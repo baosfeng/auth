@@ -64,6 +64,9 @@ public class TokenFilter implements AuthFilter {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得" + Arrays.toString(tokenNames) + "信息,请检查token名称是否正确");
 		}
 		if (authConfig.getLog()) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
+		if (authConfig.getWhiteTokenList().contains(token)) {
+			request.setAttribute(IS_WHITE_TOKEN, true);
+		}
 		request.setAttribute(TOKEN_NAME, token);
 	}
 

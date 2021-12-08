@@ -58,6 +58,8 @@ public interface AuthConstant {
 	String TEMP_PREFIX = "aBYY";
 	/** 是否为白名单url */
 	String IS_WHITE_URL = "isWhiteUrl";
+	/** 是否为白名单token */
+	String IS_WHITE_TOKEN = "isWhiteToken";
 	/** token名称 */
 	String TOKEN_NAME = "token";
 	/** 用户id */

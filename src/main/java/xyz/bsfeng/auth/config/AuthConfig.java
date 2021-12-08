@@ -51,6 +51,8 @@ public class AuthConfig {
 	private Boolean kickOutIgnoreLogin = true;
 	/** 是否需要打开日志输出 */
 	private Boolean isLog = false;
+	/** 是否设置白名单token为超管 */
+	private Boolean whiteTokenAsAdmin = true;
 
 	public Boolean getEnable() {
 		return enable;
@@ -194,6 +196,14 @@ public class AuthConfig {
 		isLog = log;
 	}
 
+	public Boolean getWhiteTokenAsAdmin() {
+		return whiteTokenAsAdmin;
+	}
+
+	public void setWhiteTokenAsAdmin(Boolean whiteTokenAsAdmin) {
+		this.whiteTokenAsAdmin = whiteTokenAsAdmin;
+	}
+
 	@Override
 	public String toString() {
 		return "AuthConfig{" +
@@ -214,6 +224,7 @@ public class AuthConfig {
 				", isAllowSampleDeviceLogin=" + isAllowSampleDeviceLogin +
 				", kickOutIgnoreLogin=" + kickOutIgnoreLogin +
 				", isLog=" + isLog +
+				", whiteTokenAsAdmin=" + whiteTokenAsAdmin +
 				'}';
 	}
 }
