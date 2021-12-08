@@ -1,6 +1,7 @@
 package xyz.bsfeng.auth.schedule;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
@@ -14,7 +15,9 @@ public class TokenSchedule {
 
 	@Scheduled(cron = "0 0/30 * * * ? ")
 	public void refreshToken() throws ExecutionException {
-		TokenDao tokenDao = AuthSpringUtils.getClass(TokenDao.class);
-		tokenDao.refreshTokenListById();
+		if (TokenManager.getConfig().getGlobalShare()) {
+			TokenDao tokenDao = AuthSpringUtils.getClass(TokenDao.class);
+			tokenDao.refreshTokenListById();
+		}
 	}
 }
