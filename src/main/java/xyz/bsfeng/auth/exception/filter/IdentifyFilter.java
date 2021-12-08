@@ -1,6 +1,5 @@
-package xyz.bsfeng.auth.filter;
+package xyz.bsfeng.auth.exception.filter;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;

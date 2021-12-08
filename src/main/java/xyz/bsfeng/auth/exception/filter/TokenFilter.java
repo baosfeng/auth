@@ -1,4 +1,4 @@
-package xyz.bsfeng.auth.filter;
+package xyz.bsfeng.auth.exception.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +25,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
 public class TokenFilter implements AuthFilter {
 
 	private final Logger log = LoggerFactory.getLogger(TokenFilter.class);
+	private Boolean ignoreCamelCase;
 
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,
@@ -35,10 +36,10 @@ public class TokenFilter implements AuthFilter {
 		String token = "";
 		String tokenFrom = "";
 		String currentTokenName = "";
-		String[] readFrom = (String[]) request.getAttribute(REQUEST_READ_FROM);
-		String[] tokenNames = (String[]) request.getAttribute(REQUEST_TOKEN_NAMES);
-		for (String from : readFrom) {
-			for (String tokenName : tokenNames) {
+		ignoreCamelCase = authConfig.getIgnoreCamelCase();
+		String[] tokenNames = authConfig.getTokenName().split(",");
+		for (String from : authConfig.getReadFrom().split(",")) {
+			for (String tokenName : authConfig.getTokenName().split(",")) {
 				if (StringUtils.isNotEmpty(token)) break;
 				switch (from) {
 					case AuthConstant.READ_FROM_HEADER:
@@ -61,13 +62,11 @@ public class TokenFilter implements AuthFilter {
 		if (StringUtils.isEmpty(token)) {
 			throw new AuthException(AuthConstant.TOKEN_EMPTY_CODE, "无法从请求体中获得" + Arrays.toString(tokenNames) + "信息,请检查token名称是否正确");
 		}
-		Boolean isLog = (Boolean) request.getAttribute(REQUEST_IS_LOG);
-		if (isLog) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
+		if (authConfig.getLog()) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
 		request.setAttribute(TOKEN_NAME, token);
 	}
 
-	private static String doReadFromHeader(String userKey, HttpServletRequest servletRequest, String tokenName) {
-		Boolean ignoreCamelCase = (Boolean) servletRequest.getAttribute(REQUEST_IGNORE_CAMELCASE);
+	private String doReadFromHeader(String userKey, HttpServletRequest servletRequest, String tokenName) {
 		if (!ignoreCamelCase) {
 			return servletRequest.getHeader(tokenName);
 		}
@@ -83,8 +82,7 @@ public class TokenFilter implements AuthFilter {
 		return userKey;
 	}
 
-	private static String doReadFromUrl(String userKey, HttpServletRequest servletRequest, String tokenName) {
-		Boolean ignoreCamelCase = (Boolean) servletRequest.getAttribute(REQUEST_IGNORE_CAMELCASE);
+	private String doReadFromUrl(String userKey, HttpServletRequest servletRequest, String tokenName) {
 		if (!ignoreCamelCase) {
 			return servletRequest.getParameter(tokenName);
 		}

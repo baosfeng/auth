@@ -12,15 +12,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.interceptor.MyFilter;
-import xyz.bsfeng.auth.interceptor.AuthInterceptor;
-import xyz.bsfeng.auth.listener.ApplicationStartListener;
+import xyz.bsfeng.auth.listener.UrlMethodListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.SpringUtils;
 
@@ -79,23 +77,13 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public AuthInterceptor authInterceptor() {
-		return new AuthInterceptor();
-	}
-
-	@Bean
 	public MyFilter authFilter() {
 		return new MyFilter();
 	}
 
 	@Bean
-	public ApplicationStartListener applicationStartListener() {
-		return new ApplicationStartListener();
-	}
-
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(authInterceptor());
+	public UrlMethodListener urlMethodListener() {
+		return new UrlMethodListener();
 	}
 
 	@Bean("authThreadPool")

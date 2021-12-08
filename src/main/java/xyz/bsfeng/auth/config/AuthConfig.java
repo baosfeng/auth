@@ -37,9 +37,9 @@ public class AuthConfig {
 	private String tokenType = "random16";
 	/** url放行白名单,支持通配符* */
 	private String whiteUrlList = "";
-	/** url黑名单,支持通配符,优先级高于白名单* */
+	/** url黑名单,支持通配符,优先级高于白名单,推荐使用注解@MustLogin * */
 	private String blackUrlList = "";
-	/** token放行白名单 */
+	/** token放行白名单,推荐使用注解@IgnoreLogin */
 	private String whiteTokenList = "";
 	/** 超级管理员的角色名称 */
 	private String adminRole = "administrator";

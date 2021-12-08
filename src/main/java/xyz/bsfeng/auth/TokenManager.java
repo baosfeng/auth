@@ -8,7 +8,7 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.filter.*;
+import xyz.bsfeng.auth.exception.filter.*;
 import xyz.bsfeng.auth.utils.SpringUtils;
 
 import java.lang.reflect.Method;
@@ -22,12 +22,14 @@ public class TokenManager {
 	private static TokenDao tokenDao;
 
 	public static Cache<String, Method> cache = CacheBuilder.newBuilder().build();
+	public static Cache<String, Method> urlMethodCache = CacheBuilder.newBuilder().build();
 	private static final ArrayList<AuthFilter> authFilters = Lists.newArrayList(
 			new WhiteUrlFilter(),
 			new TokenFilter(),
 			new IdentifyFilter(),
 			new RoleFiler(),
-			new AuthorityFilter()
+			new AuthorityFilter(),
+			new AuthRefreshFilter()
 	);
 
 	public static void setConfig(AuthConfig config) {

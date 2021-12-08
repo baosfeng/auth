@@ -26,7 +26,7 @@ public class UrlMethodListener implements ApplicationListener<ApplicationReadyEv
 
 	private static final Pattern PATTERN = Pattern.compile("(\\{.*?})");
 	private final Cache<String, Method> cache = TokenManager.cache;
-
+	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
 
 	@Override
 	public void onApplicationEvent(@Nonnull ApplicationReadyEvent event) {
@@ -40,7 +40,13 @@ public class UrlMethodListener implements ApplicationListener<ApplicationReadyEv
 			Method[] methods = type.getDeclaredMethods();
 			for (Method method : methods) {
 				Set<String> urlList = getUrlList(type, method);
-				urlList.forEach(itm -> cache.put(itm, method));
+				for (String url : urlList) {
+					if (url.contains("*")) {
+						cache.put(url, method);
+						continue;
+					}
+					urlMethodCache.put(url, method);
+				}
 			}
 		}
 	}

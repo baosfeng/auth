@@ -1,4 +1,4 @@
-package xyz.bsfeng.auth.filter;
+package xyz.bsfeng.auth.exception.filter;
 
 import xyz.bsfeng.auth.config.AuthConfig;
 
