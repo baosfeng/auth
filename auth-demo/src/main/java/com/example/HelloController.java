@@ -3,7 +3,6 @@ package com.example;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.bsfeng.auth.anno.PreAuthorize;
-import xyz.bsfeng.auth.pojo.AuthLoginModel;
 import xyz.bsfeng.auth.pojo.AuthTempUser;
 import xyz.bsfeng.auth.pojo.AuthUser;
 import xyz.bsfeng.auth.utils.TokenUtils;
@@ -22,7 +21,7 @@ public class HelloController {
 	@GetMapping("/login/device")
 	public String loginDevice(Long id) {
 		AuthUser authUser = new AuthUser(id);
-		return TokenUtils.login(authUser, new AuthLoginModel().setDevice("pc"));
+		return TokenUtils.login(authUser);
 	}
 
 	@GetMapping("/info")

@@ -56,10 +56,10 @@ public interface AuthConstant {
 	String TYPE_UUID = "uuid";
 	/** 临时token的前缀 */
 	String TEMP_PREFIX = "aBYY";
-	/** 是否输出日志 */
-	String REQUEST_IS_LOG = "isLog";
 	String IS_WHITE_URL = "isWhiteUrl";
 	String TOKEN_NAME = "token";
 	String USER_ID = "userId";
 	String USER_INFO = "userInfo";
+	Long WHITE_ID = -1L;
+	Long TEMP_ID = -2L;
 }

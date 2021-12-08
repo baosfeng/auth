@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.AuthMessageUtils;
 import xyz.bsfeng.auth.utils.AuthStringUtils;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +39,7 @@ public class MyFilter implements Filter {
 	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
 	private final ArrayList<AuthFilter> authFilters = TokenManager.getAuthFilters();
 
+	@PostConstruct
 	public void init() {
 		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
 		if (AuthStringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
@@ -72,7 +76,11 @@ public class MyFilter implements Filter {
 			return;
 		}
 		for (AuthFilter authFilter : authFilters) {
-			authFilter.doChain(servletRequest, servletResponse, authConfig, me);
+			try {
+				authFilter.doChain(servletRequest, servletResponse, authConfig, me);
+			} catch (AuthException e) {
+				AuthMessageUtils.sendErrorMessage(servletResponse, e);
+			}
 		}
 		chain.doFilter(request, response);
 	}

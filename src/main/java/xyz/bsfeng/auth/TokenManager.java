@@ -29,6 +29,7 @@ public class TokenManager {
 			new IdentifyFilter(),
 			new RoleFiler(),
 			new AuthorityFilter(),
+			new LockFilter(),
 			new AuthRefreshFilter()
 	);
 

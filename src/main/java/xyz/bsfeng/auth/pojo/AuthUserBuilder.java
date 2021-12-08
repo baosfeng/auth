@@ -14,6 +14,8 @@ public class AuthUserBuilder {
 	private String[] auths;
 	private Boolean lock;
 	private Long lockTime;
+	private Long expireTime = 0L;
+	private String deviceId;
 
 	public AuthUserBuilder() {
 	}
@@ -52,10 +54,18 @@ public class AuthUserBuilder {
 		this.lockTime = lockTime;
 		return this;
 	}
+	public AuthUserBuilder expireTime(Long expireTime) {
+		this.expireTime = expireTime;
+		return this;
+	}
+	public AuthUserBuilder deviceId(String deviceId) {
+		this.deviceId = deviceId;
+		return this;
+	}
 
 	public AuthUser build() {
 		if (id == null) throw new IllegalArgumentException("id不能为空");
-		return new AuthUser(id, roles, auths, lock, lockTime);
+		return new AuthUser(id, roles, auths, lock, lockTime, expireTime, deviceId);
 	}
 
 	public String toString() {

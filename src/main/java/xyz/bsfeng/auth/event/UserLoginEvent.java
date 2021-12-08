@@ -2,7 +2,6 @@ package xyz.bsfeng.auth.event;
 
 import org.springframework.context.ApplicationEvent;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.pojo.UserModel;
 
 /**
  * @author bsfeng
@@ -10,20 +9,13 @@ import xyz.bsfeng.auth.pojo.UserModel;
  */
 public class UserLoginEvent extends ApplicationEvent {
 
-	private final UserModel userModel;
-
 	/**
 	 * 用户登录事件
 	 *
 	 * @param userInfo
-	 * @param userModel
 	 */
-	public UserLoginEvent(UserInfo userInfo, UserModel userModel) {
+	public UserLoginEvent(UserInfo userInfo) {
 		super(userInfo);
-		this.userModel = userModel;
 	}
 
-	public UserModel getUserModel() {
-		return userModel;
-	}
 }

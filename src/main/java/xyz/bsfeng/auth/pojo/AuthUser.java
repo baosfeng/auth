@@ -20,6 +20,8 @@ public class AuthUser extends UserInfo implements Serializable {
 	private String[] auths;
 	private Boolean lock = false;
 	private Long lockTime = System.currentTimeMillis();
+	private Long expireTime = 0L;
+	private String deviceId;
 
 	private AuthUser() {
 	}
@@ -28,12 +30,14 @@ public class AuthUser extends UserInfo implements Serializable {
 		this.id = id;
 	}
 
-	public AuthUser(Long id, String[] roles, String[] auths, Boolean lock, Long lockTime) {
+	public AuthUser(Long id, String[] roles, String[] auths, Boolean lock, Long lockTime, Long expireTime, String deviceId) {
 		this.id = id;
 		this.roles = roles;
 		this.auths = auths;
 		this.lock = lock;
 		this.lockTime = lockTime;
+		this.expireTime = expireTime;
+		this.deviceId = deviceId;
 	}
 
 	@Override
@@ -86,6 +90,21 @@ public class AuthUser extends UserInfo implements Serializable {
 		this.lockTime = lockTime;
 	}
 
+	public Long getExpireTime() {
+		return expireTime;
+	}
+
+	public void setExpireTime(Long expireTime) {
+		this.expireTime = expireTime;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
 
 	@Override
 	public String toString() {
@@ -95,6 +114,8 @@ public class AuthUser extends UserInfo implements Serializable {
 				", auths=" + Arrays.toString(auths) +
 				", lock=" + lock +
 				", lockTime=" + lockTime +
+				", expireTime=" + expireTime +
+				", deviceId='" + deviceId + '\'' +
 				'}';
 	}
 }
