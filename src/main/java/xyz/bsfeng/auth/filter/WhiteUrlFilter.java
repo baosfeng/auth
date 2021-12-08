@@ -1,4 +1,4 @@
-package xyz.bsfeng.auth.exception.filter;
+package xyz.bsfeng.auth.filter;
 
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.anno.IgnoreLogin;

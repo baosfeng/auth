@@ -8,7 +8,7 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.exception.filter.*;
+import xyz.bsfeng.auth.filter.*;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import java.lang.reflect.Method;

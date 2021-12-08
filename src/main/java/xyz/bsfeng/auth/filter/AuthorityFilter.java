@@ -1,4 +1,4 @@
-package xyz.bsfeng.auth.exception.filter;
+package xyz.bsfeng.auth.filter;
 
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.PreAuthorize;
@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 /**
  * @author Administrator
- * @date 2021/12/7 22:31
+ * @date 2021/12/7 22:35
  * @since 1.0.0
  */
-public class RoleFiler implements AuthFilter {
+public class AuthorityFilter implements AuthFilter {
 
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,
@@ -32,31 +32,29 @@ public class RoleFiler implements AuthFilter {
 	                    @Nonnull Method method) {
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
-		String[] roles = annotation.hasRole();
-		Set<String> roleSet = Arrays.stream(roles).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
-		if (AuthCollectionUtils.isNotEmpty(roleSet)) {
-			String[] userRoles = TokenUtils.getUser().getRoles();
-			if (userRoles == null) {
-				throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
+		String[] auths = annotation.hasAuth();
+		Set<String> authSet = Arrays.stream(auths).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
+		if (AuthCollectionUtils.isNotEmpty(authSet)) {
+			String[] userAuths = TokenUtils.getUser().getAuths();
+			if (userAuths == null) {
+				throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 			}
-			userRoles = Arrays.stream(userRoles).filter(Objects::nonNull).toArray(String[]::new);
-			if (userRoles.length == 0) {
-				throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
+			userAuths = Arrays.stream(userAuths).filter(Objects::nonNull).toArray(String[]::new);
+			if (userAuths.length == 0) {
+				throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 			}
 			// 验证是否为超管
-			boolean isAdmin = Arrays.stream(userRoles)
+			boolean isAdmin = Arrays.stream(userAuths)
 					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
-			if (isAdmin) {
-				return;
-			}
+			if (isAdmin) return;
 			// 只要拥有的权限中存在某一个指定的权限即可
-			Set<String> rolesSet = Arrays.stream(userRoles).collect(Collectors.toSet());
-			for (String role : roleSet) {
-				if (rolesSet.contains(role)) {
+			Set<String> authsSet = Arrays.stream(userAuths).collect(Collectors.toSet());
+			for (String role : authSet) {
+				if (authsSet.contains(role)) {
 					return;
 				}
 			}
-			throw new AuthException(AuthConstant.ACCOUNT_NO_ROLE_CODE, AuthConstant.ACCOUNT_NO_ROLE_MESSAGE);
+			throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package xyz.bsfeng.auth.interceptor;
+package xyz.bsfeng.auth.filter;
 
 import com.google.common.base.Joiner;
 import com.google.common.cache.Cache;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.exception.filter.AuthFilter;
 import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 import javax.servlet.*;

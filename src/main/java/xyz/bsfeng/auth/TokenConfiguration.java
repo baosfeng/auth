@@ -17,7 +17,7 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.interceptor.MyFilter;
+import xyz.bsfeng.auth.filter.MyFilter;
 import xyz.bsfeng.auth.listener.UrlMethodListener;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
