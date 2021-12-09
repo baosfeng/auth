@@ -7,6 +7,7 @@ import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -24,7 +25,7 @@ public class AuthRefreshFilter implements AuthFilter {
 	public void doChain(@Nonnull HttpServletRequest request,
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
-	                    @Nonnull Method method) {
+	                    @Nullable Method method) {
 		if (AuthBooleanUtils.isFalse(authConfig.getAutoRenew())) return;
 		String token = (String) request.getAttribute(TOKEN_NAME);
 		Long userId = (Long) request.getAttribute(USER_ID);

@@ -3,6 +3,7 @@ package xyz.bsfeng.auth.filter;
 import xyz.bsfeng.auth.config.AuthConfig;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -24,5 +25,5 @@ public interface AuthFilter {
 	void doChain(@Nonnull HttpServletRequest request,
 	             @Nonnull HttpServletResponse response,
 	             @Nonnull AuthConfig authConfig,
-	             @Nonnull Method method);
+	             @Nullable Method method);
 }

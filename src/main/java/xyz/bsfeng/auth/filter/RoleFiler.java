@@ -10,6 +10,7 @@ import xyz.bsfeng.auth.utils.AuthStringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -31,7 +32,8 @@ public class RoleFiler implements AuthFilter {
 	public void doChain(@Nonnull HttpServletRequest request,
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
-	                    @Nonnull Method method) {
+	                    @Nullable Method method) {
+		if (method == null) return;
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
 		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_ADMIN))) return;

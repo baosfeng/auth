@@ -11,6 +11,7 @@ import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -30,7 +31,7 @@ public class IdentifyFilter implements AuthFilter {
 	public void doChain(@Nonnull HttpServletRequest request,
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
-	                    @Nonnull Method method) {
+	                    @Nullable Method method) {
 		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) {
 			request.setAttribute(USER_ID, WHITE_ID);
 			request.setAttribute(USER_INFO, new AuthUserBuilder().id(WHITE_ID).build());

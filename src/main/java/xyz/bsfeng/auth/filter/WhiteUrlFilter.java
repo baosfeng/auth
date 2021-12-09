@@ -6,6 +6,7 @@ import xyz.bsfeng.auth.anno.MustLogin;
 import xyz.bsfeng.auth.config.AuthConfig;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -25,14 +26,16 @@ public class WhiteUrlFilter implements AuthFilter {
 	public void doChain(@Nonnull HttpServletRequest request,
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
-	                    @Nonnull Method method) {
-		if (method.isAnnotationPresent(MustLogin.class)) {
-			request.setAttribute(IS_WHITE_URL, false);
-			return;
-		}
-		if (method.isAnnotationPresent(IgnoreLogin.class)) {
-			request.setAttribute(IS_WHITE_URL, true);
-			return;
+	                    @Nullable Method method) {
+		if (method != null) {
+			if (method.isAnnotationPresent(MustLogin.class)) {
+				request.setAttribute(IS_WHITE_URL, false);
+				return;
+			}
+			if (method.isAnnotationPresent(IgnoreLogin.class)) {
+				request.setAttribute(IS_WHITE_URL, true);
+				return;
+			}
 		}
 		String[] whiteUrlList = authConfig.getWhiteUrlList().split(",");
 		String[] blackUrlList = authConfig.getBlackUrlList().split(",");

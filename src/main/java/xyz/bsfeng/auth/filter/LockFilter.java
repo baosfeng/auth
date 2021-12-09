@@ -7,6 +7,7 @@ import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthTimeUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -23,7 +24,7 @@ public class LockFilter implements AuthFilter {
 	public void doChain(@Nonnull HttpServletRequest request,
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
-	                    @Nonnull Method method) {
+	                    @Nullable Method method) {
 		UserInfo userInfo = (UserInfo) request.getAttribute(USER_INFO);
 		// 检查是否被封禁
 		if (AuthBooleanUtils.isTrue(userInfo.getLock())) {

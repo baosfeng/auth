@@ -71,10 +71,6 @@ public class MyFilter implements Filter {
 				}
 			}
 		}
-		if (me == null) {
-			chain.doFilter(request, response);
-			return;
-		}
 		try {
 			for (AuthFilter authFilter : authFilters) {
 				authFilter.doChain(servletRequest, servletResponse, authConfig, me);
