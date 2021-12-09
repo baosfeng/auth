@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.filter;
 
-import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
@@ -19,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static xyz.bsfeng.auth.constant.AuthConstant.IS_WHITE_TOKEN;
+import static xyz.bsfeng.auth.constant.AuthConstant.IS_ADMIN;
 
 /**
  * @author Administrator
@@ -35,10 +34,7 @@ public class AuthorityFilter implements AuthFilter {
 	                    @Nonnull Method method) {
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
-		Boolean isWhiteToken = (Boolean) request.getAttribute(IS_WHITE_TOKEN);
-		if (AuthBooleanUtils.isTrue(isWhiteToken) && authConfig.getWhiteTokenAsAdmin()) {
-			return;
-		}
+		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_ADMIN))) return;
 		String[] auths = annotation.hasAuth();
 		Set<String> authSet = Arrays.stream(auths).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
 		if (AuthCollectionUtils.isNotEmpty(authSet)) {
@@ -50,10 +46,7 @@ public class AuthorityFilter implements AuthFilter {
 			if (userAuths.length == 0) {
 				throw new AuthException(AuthConstant.ACCOUNT_NO_AUTH_CODE, AuthConstant.ACCOUNT_NO_AUTH_MESSAGE);
 			}
-			// 验证是否为超管
-			boolean isAdmin = Arrays.stream(userAuths)
-					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
-			if (isAdmin) return;
+
 			// 只要拥有的权限中存在某一个指定的权限即可
 			Set<String> authsSet = Arrays.stream(userAuths).collect(Collectors.toSet());
 			for (String role : authSet) {

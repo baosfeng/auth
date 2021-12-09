@@ -178,6 +178,10 @@ public class TokenUtils {
 		return (String) attribute;
 	}
 
+	public static boolean isAdmin() {
+		return (boolean) AuthSpringMVCUtil.getRequest().getAttribute(IS_ADMIN);
+	}
+
 	private static String getTokenKey() {
 		String token;
 		switch (tokenType) {

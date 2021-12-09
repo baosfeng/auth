@@ -27,6 +27,7 @@ public class TokenManager {
 			new WhiteUrlFilter(),
 			new TokenFilter(),
 			new IdentifyFilter(),
+			new AdminFilter(),
 			new RoleFiler(),
 			new AuthorityFilter(),
 			new LockFilter(),

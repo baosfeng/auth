@@ -60,6 +60,8 @@ public interface AuthConstant {
 	String IS_WHITE_URL = "isWhiteUrl";
 	/** 是否为白名单token */
 	String IS_WHITE_TOKEN = "isWhiteToken";
+	/** 是否为管理员 */
+	String IS_ADMIN = "isAdmin";
 	/** token名称 */
 	String TOKEN_NAME = "token";
 	/** 用户id */
