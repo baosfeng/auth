@@ -133,6 +133,7 @@ public class TokenUtils {
 	 * @param token 当前正在使用的token
 	 */
 	public static void kickOut(String token) {
+		if (AuthBooleanUtils.isFalse(enable)) return;
 		if (AuthStringUtils.isEmpty(token)) {
 			throw new AuthException(KICK_OUT_TOKEN_EMPTY_CODE, KICK_OUT_TOKEN_EMPTY_MESSAGE);
 		}
@@ -150,6 +151,7 @@ public class TokenUtils {
 	 * @param lockTime 封禁时间
 	 */
 	public static void lock(String token, long lockTime) {
+		if (AuthBooleanUtils.isFalse(enable)) return;
 		if (lockTime < 0) {
 			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
 		}
@@ -165,6 +167,7 @@ public class TokenUtils {
 	}
 
 	public static Long getId() {
+		if (AuthBooleanUtils.isFalse(enable)) return -3L;
 		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
 		return (Long) request.getAttribute(USER_ID);
 	}
@@ -175,22 +178,26 @@ public class TokenUtils {
 
 
 	public static String getToken() {
+		if (AuthBooleanUtils.isFalse(enable)) return "";
 		HttpServletRequest servletRequest = AuthSpringMVCUtil.getRequest();
 		Object attribute = servletRequest.getAttribute(TOKEN_NAME);
 		return (String) attribute;
 	}
 
 	public static boolean isAdmin() {
+		if (AuthBooleanUtils.isFalse(enable)) return false;
 		return (boolean) AuthSpringMVCUtil.getRequest().getAttribute(IS_ADMIN);
 	}
 
 	public static boolean hasRole(String roleName) {
+		if (AuthBooleanUtils.isFalse(enable)) return false;
 		return Arrays.stream(getUser().getRoles())
 				.filter(Objects::nonNull)
 				.anyMatch(itm -> itm.equalsIgnoreCase(roleName));
 	}
 
 	public static boolean hasAuth(String auth) {
+		if (AuthBooleanUtils.isFalse(enable)) return false;
 		return Arrays.stream(getUser().getAuths())
 				.filter(Objects::nonNull)
 				.anyMatch(itm -> itm.equalsIgnoreCase(auth));
