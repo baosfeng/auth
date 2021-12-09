@@ -18,6 +18,8 @@ import xyz.bsfeng.auth.pojo.AuthUser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
@@ -180,6 +182,18 @@ public class TokenUtils {
 
 	public static boolean isAdmin() {
 		return (boolean) AuthSpringMVCUtil.getRequest().getAttribute(IS_ADMIN);
+	}
+
+	public static boolean hasRole(String roleName) {
+		return Arrays.stream(getUser().getRoles())
+				.filter(Objects::nonNull)
+				.anyMatch(itm -> itm.equalsIgnoreCase(roleName));
+	}
+
+	public static boolean hasAuth(String auth) {
+		return Arrays.stream(getUser().getAuths())
+				.filter(Objects::nonNull)
+				.anyMatch(itm -> itm.equalsIgnoreCase(auth));
 	}
 
 	private static String getTokenKey() {
