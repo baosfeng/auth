@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
@@ -24,6 +26,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
  * @date 2021/12/7 22:19
  * @since 1.0.0
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class IdentifyFilter implements AuthFilter {
 
 

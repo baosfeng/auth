@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ public class MyFilter implements Filter {
 	private String errorPath;
 	private final Cache<String, Method> cache = TokenManager.cache;
 	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
-	private final ArrayList<AuthFilter> authFilters = TokenManager.getAuthFilters();
+	private final List<AuthFilter> authFilters = TokenManager.getAuthFilters();
 
 	@PostConstruct
 	public void init() {

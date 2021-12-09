@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.anno.IgnoreLogin;
 import xyz.bsfeng.auth.anno.MustLogin;
@@ -18,6 +20,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.IS_WHITE_URL;
  * @date 2021/12/7 22:09
  * @since 1.0.0
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class WhiteUrlFilter implements AuthFilter {
 
 	private static final AntPathMatcher MATCHER = new AntPathMatcher();

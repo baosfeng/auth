@@ -2,6 +2,8 @@ package xyz.bsfeng.auth.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.exception.AuthException;
@@ -23,6 +25,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
  * @date 2021/12/7 21:58
  * @since 1.0.0
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class TokenFilter implements AuthFilter {
 
 	private final Logger log = LoggerFactory.getLogger(TokenFilter.class);

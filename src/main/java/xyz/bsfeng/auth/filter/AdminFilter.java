@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.UserInfo;
@@ -19,6 +20,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
  * @author bsfeng
  * @date 2021/12/9 9:02
  */
+@Order()
 public class AdminFilter implements AuthFilter {
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,

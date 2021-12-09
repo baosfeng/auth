@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
@@ -23,6 +24,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
  * @author bsfeng
  * @date 2021/12/8 8:59
  */
+@Order
 public class AuthRefreshFilter implements AuthFilter {
 
 	private final ThreadPoolExecutor executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),

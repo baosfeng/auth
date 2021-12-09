@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
@@ -12,8 +13,9 @@ import xyz.bsfeng.auth.filter.*;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TokenManager {
 
@@ -23,7 +25,7 @@ public class TokenManager {
 
 	public static Cache<String, Method> cache = CacheBuilder.newBuilder().build();
 	public static Cache<String, Method> urlMethodCache = CacheBuilder.newBuilder().build();
-	private static final ArrayList<AuthFilter> authFilters = Lists.newArrayList(
+	private static List<AuthFilter> authFilters = Lists.newArrayList(
 			new WhiteUrlFilter(),
 			new TokenFilter(),
 			new IdentifyFilter(),
@@ -33,6 +35,10 @@ public class TokenManager {
 			new LockFilter(),
 			new AuthRefreshFilter()
 	);
+
+	static {
+		sortFilter();
+	}
 
 	public static void setConfig(AuthConfig config) {
 		authConfig = config;
@@ -64,13 +70,25 @@ public class TokenManager {
 		return tokenDao;
 	}
 
-	public static ArrayList<AuthFilter> getAuthFilters() {
+	public static List<AuthFilter> getAuthFilters() {
 		return authFilters;
 	}
 
 	public static List<AuthFilter> addFilter(AuthFilter filter) {
 		authFilters.add(filter);
+		sortFilter();
 		return authFilters;
+	}
+
+	private synchronized static void sortFilter() {
+		authFilters = authFilters.stream()
+				.sorted(Comparator.comparingInt(TokenManager::getValue))
+				.collect(Collectors.toList());
+	}
+
+	private static int getValue(AuthFilter authFilter) {
+		Order order = authFilter.getClass().getAnnotation(Order.class);
+		return order == null ? Integer.MAX_VALUE : order.value();
 	}
 
 }

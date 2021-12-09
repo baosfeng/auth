@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.exception.AuthException;
@@ -18,6 +19,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.*;
  * @author bsfeng
  * @date 2021/12/8 11:00
  */
+@Order
 public class LockFilter implements AuthFilter {
 
 	@Override

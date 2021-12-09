@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
@@ -26,6 +27,7 @@ import static xyz.bsfeng.auth.constant.AuthConstant.IS_ADMIN;
  * @date 2021/12/7 22:35
  * @since 1.0.0
  */
+@Order
 public class AuthorityFilter implements AuthFilter {
 
 	@Override
