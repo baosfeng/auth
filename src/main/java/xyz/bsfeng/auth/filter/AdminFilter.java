@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
@@ -32,7 +33,7 @@ public class AdminFilter implements AuthFilter {
 		String[] auths = userInfo.getAuths();
 		if (auths != null && auths.length != 0) {
 			// 验证是否为超管
-			boolean isAdmin = Arrays.stream(auths)
+			boolean isAdmin = Arrays.stream(auths).filter(Objects::nonNull)
 					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
 			request.setAttribute(IS_ADMIN, isAdmin);
 			return;
@@ -40,7 +41,7 @@ public class AdminFilter implements AuthFilter {
 		String[] roles = userInfo.getRoles();
 		if (roles != null && roles.length != 0) {
 			// 验证是否为超管
-			boolean isAdmin = Arrays.stream(roles)
+			boolean isAdmin = Arrays.stream(roles).filter(Objects::nonNull)
 					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
 			request.setAttribute(IS_ADMIN, isAdmin);
 			return;
