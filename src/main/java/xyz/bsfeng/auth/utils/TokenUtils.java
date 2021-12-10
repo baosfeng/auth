@@ -191,14 +191,18 @@ public class TokenUtils {
 
 	public static boolean hasRole(String roleName) {
 		if (AuthBooleanUtils.isFalse(enable)) return false;
-		return Arrays.stream(getUser().getRoles())
+		String[] roles = getUser().getRoles();
+		if (roles == null || roles.length == 0) return false;
+		return Arrays.stream(roles)
 				.filter(Objects::nonNull)
 				.anyMatch(itm -> itm.equalsIgnoreCase(roleName));
 	}
 
 	public static boolean hasAuth(String auth) {
 		if (AuthBooleanUtils.isFalse(enable)) return false;
-		return Arrays.stream(getUser().getAuths())
+		String[] auths = getUser().getAuths();
+		if (auths == null || auths.length == 0) return false;
+		return Arrays.stream(auths)
 				.filter(Objects::nonNull)
 				.anyMatch(itm -> itm.equalsIgnoreCase(auth));
 	}
