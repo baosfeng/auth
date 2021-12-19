@@ -87,27 +87,4 @@ public class TokenConfiguration implements WebMvcConfigurer {
 		return new UrlMethodListener();
 	}
 
-	@Bean("authThreadPool")
-	@Qualifier("authThreadPool")
-	@ConditionalOnMissingBean(ThreadPoolExecutor.class)
-	public ThreadPoolExecutor authThreadPool() {
-		return new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),
-				Runtime.getRuntime().availableProcessors(),
-				0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<>(),
-				threadFactory());
-	}
-
-	public ThreadFactory threadFactory() {
-		return new ThreadFactory() {
-			private final AtomicInteger atomicInteger = new AtomicInteger();
-
-			@Override
-			public Thread newThread(@Nonnull Runnable r) {
-				String threadName = "auth_" + atomicInteger.getAndIncrement() + "";
-				return new Thread(null, r, threadName, 0);
-			}
-		};
-	}
-
 }
