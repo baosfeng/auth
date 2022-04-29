@@ -1,8 +1,6 @@
 package xyz.bsfeng.auth;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,16 +16,9 @@ import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
 import xyz.bsfeng.auth.filter.MyFilter;
-import xyz.bsfeng.auth.listener.UrlMethodListener;
+import xyz.bsfeng.auth.listener.AuthBeanPostProcessor;
 import xyz.bsfeng.auth.running.AuthEnvironmentAware;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
-
-import javax.annotation.Nonnull;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author bsfeng
@@ -83,8 +74,8 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public UrlMethodListener urlMethodListener() {
-		return new UrlMethodListener();
+	public AuthBeanPostProcessor authBeanPostProcessor() {
+		return new AuthBeanPostProcessor();
 	}
 
 }
