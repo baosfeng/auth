@@ -24,6 +24,7 @@ import java.util.Map;
 public class AuthEnvironmentAware implements EnvironmentAware, ApplicationContextAware {
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setEnvironment(@Nonnull Environment environment) {
 		ConfigurableEnvironment c = (ConfigurableEnvironment) environment;
 		MutablePropertySources sources = c.getPropertySources();

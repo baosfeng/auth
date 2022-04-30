@@ -3,6 +3,7 @@ package xyz.bsfeng.auth;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -15,16 +16,15 @@ import xyz.bsfeng.auth.utils.AuthSpringUtils;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TokenManager {
 
 	private static AuthConfig authConfig;
-
 	private static TokenDao tokenDao;
-
-	public static Cache<String, Method> cache = CacheBuilder.newBuilder().build();
-	public static Cache<String, Method> urlMethodCache = CacheBuilder.newBuilder().build();
+	public static Map<String, Method> cache = Maps.newConcurrentMap();
+	public static Map<String, Method> urlMethodCache = Maps.newConcurrentMap();
 	private static List<AuthFilter> authFilters = Lists.newArrayList(
 			new WhiteUrlFilter(),
 			new TokenFilter(),

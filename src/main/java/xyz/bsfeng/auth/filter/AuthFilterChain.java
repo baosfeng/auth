@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.filter;
 
-import com.google.common.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -21,8 +20,8 @@ import java.util.Map;
 public class AuthFilterChain {
 
 	private final Logger log = LoggerFactory.getLogger(AuthFilterChain.class);
-	private final Cache<String, Method> cache = TokenManager.cache;
-	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
+	private final Map<String, Method> cache = TokenManager.cache;
+	private final Map<String, Method> urlMethodCache = TokenManager.urlMethodCache;
 	private static final AntPathMatcher MATCHER = new AntPathMatcher();
 	private static final List<AuthFilter> authFilters = TokenManager.getAuthFilters();
 
@@ -53,13 +52,13 @@ public class AuthFilterChain {
 	private Method getMethod(@NonNull HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		if (authConfig.getLog()) log.debug("正在访问{}", uri);
-		Method me = urlMethodCache.getIfPresent(uri);
+		Method me = cache.get(uri);
 		if (me == null) {
-			for (Map.Entry<String, Method> entry : cache.asMap().entrySet()) {
+			for (Map.Entry<String, Method> entry : urlMethodCache.entrySet()) {
 				String key = entry.getKey();
 				Method method = entry.getValue();
 				if (MATCHER.match(key, uri)) {
-					urlMethodCache.put(uri, method);
+					cache.put(uri, method);
 					return method;
 				}
 			}

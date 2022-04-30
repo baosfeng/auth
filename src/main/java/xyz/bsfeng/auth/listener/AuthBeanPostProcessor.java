@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.listener;
 
-import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -15,6 +14,7 @@ import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Component
 public class AuthBeanPostProcessor implements BeanPostProcessor {
 
-	private final Cache<String, Method> cache = TokenManager.cache;
-	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
+	private final Map<String, Method> cache = TokenManager.cache;
+	private final Map<String, Method> urlMethodCache = TokenManager.urlMethodCache;
 
 	@Override
 	public Object postProcessAfterInitialization(@NonNull Object bean,
