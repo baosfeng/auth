@@ -1,7 +1,12 @@
 package xyz.bsfeng.auth.config;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 /**
  * @author bsfeng
@@ -9,7 +14,8 @@ import org.springframework.validation.annotation.Validated;
  * @since 1.0
  */
 @Validated
-public class AuthConfig {
+public class AuthConfig implements InitializingBean {
+
 	/** 是否启用验证 */
 	private Boolean enable = true;
 	/** token名称,如果使用逗号进行分割，表示可从多种方式读取 */
@@ -226,5 +232,19 @@ public class AuthConfig {
 				", isLog=" + isLog +
 				", whiteTokenAsAdmin=" + whiteTokenAsAdmin +
 				'}';
+	}
+
+	@Value("${error.path:/error}")
+	private String errorPath;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
+		if (AuthStringUtils.isNotEmpty(getWhiteUrlList())) {
+			String s = getWhiteUrlList() + "," + join;
+			setWhiteUrlList(s);
+		} else {
+			setWhiteUrlList(join);
+		}
 	}
 }

@@ -1,84 +1,30 @@
 package xyz.bsfeng.auth.filter;
 
-import com.google.common.base.Joiner;
-import com.google.common.cache.Cache;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.AntPathMatcher;
-import xyz.bsfeng.auth.TokenManager;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.AuthMessageUtils;
-import xyz.bsfeng.auth.utils.AuthStringUtils;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author bsfeng
  * @date 2021/9/28 11:45
  */
+@Order(value = Ordered.HIGHEST_PRECEDENCE)
 public class MyFilter implements Filter {
 
-	private final Logger log = LoggerFactory.getLogger(MyFilter.class);
 	@Autowired
 	private AuthConfig authConfig;
-	private static final AntPathMatcher MATCHER = new AntPathMatcher();
-	@Value("${error.path:/error}")
-	private String errorPath;
-	private final Cache<String, Method> cache = TokenManager.cache;
-	private final Cache<String, Method> urlMethodCache = TokenManager.urlMethodCache;
-	private final List<AuthFilter> authFilters = TokenManager.getAuthFilters();
 
-	@PostConstruct
-	public void init() {
-		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
-		if (AuthStringUtils.isNotEmpty(authConfig.getWhiteUrlList())) {
-			String s = authConfig.getWhiteUrlList() + "," + join;
-			authConfig.setWhiteUrlList(s);
-		} else {
-			authConfig.setWhiteUrlList(join);
-		}
-	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		if (!authConfig.getEnable()) {
-			chain.doFilter(request, response);
-			return;
-		}
-		HttpServletRequest servletRequest = (HttpServletRequest) request;
-		HttpServletResponse servletResponse = (HttpServletResponse) response;
-		String uri = servletRequest.getRequestURI();
-		if (authConfig.getLog()) log.debug("正在访问{}", uri);
-		Method me = urlMethodCache.getIfPresent(uri);
-		if (me == null) {
-			for (Map.Entry<String, Method> entry : cache.asMap().entrySet()) {
-				String key = entry.getKey();
-				Method method = entry.getValue();
-				if (MATCHER.match(key, uri)) {
-					me = method;
-					break;
-				}
-			}
-		}
-		try {
-			for (AuthFilter authFilter : authFilters) {
-				authFilter.doChain(servletRequest, servletResponse, authConfig, me);
-			}
-		} catch (AuthException e) {
-			AuthMessageUtils.sendErrorMessage(servletResponse, e);
-			return;
-		}
+		AuthFilterChain authFilter = new AuthFilterChain(authConfig);
+		authFilter.doFilter((HttpServletRequest) request, (HttpServletResponse) response);
 		chain.doFilter(request, response);
 	}
 
