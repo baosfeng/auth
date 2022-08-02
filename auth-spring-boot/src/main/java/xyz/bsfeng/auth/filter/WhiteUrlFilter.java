@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Administrator
@@ -37,8 +38,8 @@ public class WhiteUrlFilter implements AuthFilter {
 				return;
 			}
 		}
-		String[] whiteUrlList = authConfig.getWhiteUrlList().split(",");
-		String[] blackUrlList = authConfig.getBlackUrlList().split(",");
+		List<String> whiteUrlList = authConfig.getWhiteUrlList();
+		List<String> blackUrlList = authConfig.getBlackUrlList();
 		String uri = request.getRequestURI();
 		for (String url : blackUrlList) {
 			boolean match = MATCHER.match(url, uri);

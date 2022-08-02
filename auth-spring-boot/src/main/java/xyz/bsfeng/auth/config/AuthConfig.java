@@ -1,5 +1,7 @@
 package xyz.bsfeng.auth.config;
 
+import org.springframework.util.CollectionUtils;
+import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 import xyz.bsfeng.auth.utils.AuthStringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -7,6 +9,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bsfeng
@@ -40,11 +45,11 @@ public class AuthConfig implements InitializingBean {
 	@NonNull
 	private String tokenType = "random16";
 	/** url放行白名单,支持通配符* */
-	private String whiteUrlList = "";
+	private List<String> whiteUrlList;
 	/** url黑名单,支持通配符,优先级高于白名单,推荐使用注解@MustLogin * */
-	private String blackUrlList = "";
+	private List<String> blackUrlList;
 	/** token放行白名单,推荐使用注解@IgnoreLogin */
-	private String whiteTokenList = "";
+	private List<String> whiteTokenList;
 	/** 超级管理员的角色名称 */
 	private String adminRole = "administrator";
 	/** 用于实现多种业务平台，多个业务平台使用不同的认证 */
@@ -130,27 +135,27 @@ public class AuthConfig implements InitializingBean {
 		this.tokenType = tokenType;
 	}
 
-	public String getWhiteUrlList() {
+	public List<String> getWhiteUrlList() {
 		return whiteUrlList;
 	}
 
-	public void setWhiteUrlList(String whiteUrlList) {
+	public void setWhiteUrlList(List<String> whiteUrlList) {
 		this.whiteUrlList = whiteUrlList;
 	}
 
-	public String getBlackUrlList() {
-		return blackUrlList;
+	public List<String> getBlackUrlList() {
+		return CollectionUtils.isEmpty(blackUrlList) ? new ArrayList<>() : blackUrlList;
 	}
 
-	public void setBlackUrlList(String blackUrlList) {
+	public void setBlackUrlList(List<String> blackUrlList) {
 		this.blackUrlList = blackUrlList;
 	}
 
-	public String getWhiteTokenList() {
-		return whiteTokenList;
+	public List<String> getWhiteTokenList() {
+		return CollectionUtils.isEmpty(whiteTokenList) ? new ArrayList<>() : whiteTokenList;
 	}
 
-	public void setWhiteTokenList(String whiteTokenList) {
+	public void setWhiteTokenList(List<String> whiteTokenList) {
 		this.whiteTokenList = whiteTokenList;
 	}
 
@@ -238,13 +243,12 @@ public class AuthConfig implements InitializingBean {
 	private String errorPath;
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		String join = Joiner.on(",").join(Lists.newArrayList("/favicon.ico", errorPath));
-		if (AuthStringUtils.isNotEmpty(getWhiteUrlList())) {
-			String s = getWhiteUrlList() + "," + join;
-			setWhiteUrlList(s);
-		} else {
-			setWhiteUrlList(join);
+	public void afterPropertiesSet() {
+		ArrayList<String> errorPath = Lists.newArrayList("/favicon.ico", this.errorPath);
+		if (AuthCollectionUtils.isNotEmpty(getWhiteUrlList())) {
+			getWhiteUrlList().addAll(errorPath);
+			return;
 		}
+		whiteUrlList = errorPath;
 	}
 }

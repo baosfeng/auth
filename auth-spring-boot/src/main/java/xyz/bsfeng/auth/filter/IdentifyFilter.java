@@ -39,7 +39,7 @@ public class IdentifyFilter implements AuthFilter {
 			return;
 		}
 		String token = (String) request.getAttribute(TOKEN_NAME);
-		boolean anyMatch = Arrays.asList(authConfig.getWhiteTokenList().split(",")).contains(token);
+		boolean anyMatch = authConfig.getWhiteTokenList().contains(token);
 		if (anyMatch) {
 			request.setAttribute(USER_ID, WHITE_TOKEN_ID);
 			request.setAttribute(USER_INFO, new AuthUserBuilder().id(WHITE_TOKEN_ID).build());
