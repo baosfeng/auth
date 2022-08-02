@@ -24,8 +24,8 @@ public class MyFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		AuthFilterChain authFilter = new AuthFilterChain(authConfig);
-		authFilter.doFilter((HttpServletRequest) request, (HttpServletResponse) response);
-		chain.doFilter(request, response);
+		boolean filterResult = authFilter.doFilter((HttpServletRequest) request, (HttpServletResponse) response);
+		if (filterResult) chain.doFilter(request, response);
 	}
 
 }

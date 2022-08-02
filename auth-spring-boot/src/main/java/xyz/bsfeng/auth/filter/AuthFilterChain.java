@@ -33,19 +33,21 @@ public class AuthFilterChain {
 		currentIndex = 0;
 	}
 
-	public void doFilter(@NonNull HttpServletRequest request,
-	                     @NonNull HttpServletResponse response) throws IOException {
-		if (!authConfig.getEnable()) return;
-		if (currentIndex < authFilters.size()) {
+	public boolean doFilter(@NonNull HttpServletRequest request,
+	                        @NonNull HttpServletResponse response) throws IOException {
+		if (!authConfig.getEnable()) return false;
+		Method method = getMethod(request);
+		while (currentIndex < authFilters.size()) {
 			AuthFilter authFilter = authFilters.get(currentIndex++);
-			Method method = getMethod(request);
-			if (method == null) return;
+			if (method == null) return false;
 			try {
 				authFilter.doChain(request, response, authConfig, method);
 			} catch (AuthException e) {
 				AuthMessageUtils.sendErrorMessage(response, e);
+				return false;
 			}
 		}
+		return true;
 	}
 
 	@Nullable
