@@ -41,7 +41,7 @@ public class AuthFilterChain {
 			AuthFilter authFilter = authFilters.get(currentIndex++);
 			if (method == null) return false;
 			try {
-				authFilter.doChain(request, response, authConfig, method);
+				authFilter.doChain(request, authConfig, method);
 			} catch (AuthException e) {
 				AuthMessageUtils.sendErrorMessage(response, e);
 				return false;

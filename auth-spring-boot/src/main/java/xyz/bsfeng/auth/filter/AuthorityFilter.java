@@ -13,7 +13,6 @@ import org.springframework.core.annotation.Order;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
@@ -30,7 +29,6 @@ public class AuthorityFilter implements AuthFilter {
 
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,
-	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
 		if (method == null) return;

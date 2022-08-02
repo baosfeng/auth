@@ -11,7 +11,6 @@ import org.springframework.core.annotation.Order;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -23,7 +22,6 @@ public class LockFilter implements AuthFilter {
 
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,
-	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
 		UserInfo userInfo = (UserInfo) request.getAttribute(AuthConstant.USER_INFO);

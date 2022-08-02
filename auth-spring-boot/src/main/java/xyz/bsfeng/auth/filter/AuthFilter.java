@@ -5,7 +5,6 @@ import xyz.bsfeng.auth.config.AuthConfig;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -17,13 +16,12 @@ public interface AuthFilter {
 
 	/**
 	 * 拦截器链
+	 *
 	 * @param request
-	 * @param response
 	 * @param authConfig
 	 * @param method
 	 */
 	void doChain(@Nonnull HttpServletRequest request,
-	             @Nonnull HttpServletResponse response,
 	             @Nonnull AuthConfig authConfig,
 	             @Nullable Method method);
 }

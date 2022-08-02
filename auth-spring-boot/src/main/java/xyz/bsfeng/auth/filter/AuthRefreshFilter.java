@@ -11,7 +11,6 @@ import org.springframework.core.annotation.Order;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -40,7 +39,6 @@ public class AuthRefreshFilter implements AuthFilter {
 
 	@Override
 	public void doChain(@Nonnull HttpServletRequest request,
-	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
 		if (AuthBooleanUtils.isFalse(authConfig.getAutoRenew())) return;
