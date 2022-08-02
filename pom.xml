@@ -9,6 +9,7 @@
     <description>权限校验</description>
     <modules>
         <module>auth-spring-boot</module>
+        <module>auth-test</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
