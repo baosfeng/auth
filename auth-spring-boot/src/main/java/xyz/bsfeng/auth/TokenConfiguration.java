@@ -53,7 +53,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	@ConfigurationProperties("xyz/bsfeng/auth")
+	@ConfigurationProperties("auth")
 	public AuthConfig authConfig() {
 		return new AuthConfig();
 	}
