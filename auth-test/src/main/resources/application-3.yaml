@@ -1,0 +1,6 @@
+auth:
+  enable: true
+  log: true
+  timeout: 1
+  auto-renew: false
+

@@ -1,0 +1,5 @@
+auth:
+  enable: true
+  log: true
+  timeout: 5
+

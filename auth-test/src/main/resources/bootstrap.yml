@@ -1,0 +1,10 @@
+logging:
+  level:
+    root: info
+    xyz.bsfeng.auth: debug
+    xyz.bsfeng: debug
+spring:
+  redis:
+    password: e9xkcVZIGY3A6RoP
+    host: 110.40.194.175
+    port: 6379
