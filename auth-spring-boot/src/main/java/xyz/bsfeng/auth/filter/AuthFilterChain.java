@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import xyz.bsfeng.auth.exception.AuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -7,7 +8,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.utils.AuthMessageUtils;
 
 import javax.servlet.http.HttpServletRequest;

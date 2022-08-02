@@ -1,11 +1,12 @@
 package xyz.bsfeng.auth.filter;
 
-import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,8 +18,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
 /**
  * @author bsfeng
@@ -45,11 +44,11 @@ public class AuthRefreshFilter implements AuthFilter {
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
 		if (AuthBooleanUtils.isFalse(authConfig.getAutoRenew())) return;
-		String token = (String) request.getAttribute(TOKEN_NAME);
-		Long userId = (Long) request.getAttribute(USER_ID);
+		String token = (String) request.getAttribute(AuthConstant.TOKEN_NAME);
+		Long userId = (Long) request.getAttribute(AuthConstant.USER_ID);
 		if (userId <= 0) return;
 		// 执行异步更新
 		TokenDao tokenDao = AuthSpringUtils.getClass(TokenDao.class);
-		executor.submit(() -> tokenDao.updateUserInfo(token, (UserInfo) request.getAttribute(USER_INFO)));
+		executor.submit(() -> tokenDao.updateUserInfo(token, (UserInfo) request.getAttribute(AuthConstant.USER_INFO)));
 	}
 }

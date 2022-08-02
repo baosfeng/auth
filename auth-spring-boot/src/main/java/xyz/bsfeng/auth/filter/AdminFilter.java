@@ -1,10 +1,11 @@
 package xyz.bsfeng.auth.filter;
 
-import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
+import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.UserInfo;
 import xyz.bsfeng.auth.utils.AuthBooleanUtils;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
 /**
  * @author bsfeng
@@ -27,18 +26,18 @@ public class AdminFilter implements AuthFilter {
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
-		Boolean isWhiteToken = (Boolean) request.getAttribute(IS_WHITE_TOKEN);
+		Boolean isWhiteToken = (Boolean) request.getAttribute(AuthConstant.IS_WHITE_TOKEN);
 		if (AuthBooleanUtils.isTrue(isWhiteToken) && authConfig.getWhiteTokenAsAdmin()) {
-			request.setAttribute(IS_ADMIN, true);
+			request.setAttribute(AuthConstant.IS_ADMIN, true);
 			return;
 		}
-		UserInfo userInfo = (UserInfo) request.getAttribute(USER_INFO);
+		UserInfo userInfo = (UserInfo) request.getAttribute(AuthConstant.USER_INFO);
 		String[] auths = userInfo.getAuths();
 		if (auths != null && auths.length != 0) {
 			// 验证是否为超管
 			boolean isAdmin = Arrays.stream(auths).filter(Objects::nonNull)
 					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
-			request.setAttribute(IS_ADMIN, isAdmin);
+			request.setAttribute(AuthConstant.IS_ADMIN, isAdmin);
 			return;
 		}
 		String[] roles = userInfo.getRoles();
@@ -46,9 +45,9 @@ public class AdminFilter implements AuthFilter {
 			// 验证是否为超管
 			boolean isAdmin = Arrays.stream(roles).filter(Objects::nonNull)
 					.anyMatch(itm -> itm.equalsIgnoreCase(TokenManager.getConfig().getAdminRole()));
-			request.setAttribute(IS_ADMIN, isAdmin);
+			request.setAttribute(AuthConstant.IS_ADMIN, isAdmin);
 			return;
 		}
-		request.setAttribute(IS_ADMIN, false);
+		request.setAttribute(AuthConstant.IS_ADMIN, false);
 	}
 }

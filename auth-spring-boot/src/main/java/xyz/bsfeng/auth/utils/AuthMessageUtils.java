@@ -1,7 +1,7 @@
 package xyz.bsfeng.auth.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import xyz.bsfeng.auth.exception.AuthException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

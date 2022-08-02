@@ -1,12 +1,12 @@
 package xyz.bsfeng.auth.config;
 
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
-import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 /**
  * @author bsfeng

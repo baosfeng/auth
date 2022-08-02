@@ -1,10 +1,10 @@
 package xyz.bsfeng.auth.dao;
 
 
-import org.springframework.data.redis.core.RedisTemplate;
 import xyz.bsfeng.auth.TokenManager;
-import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
+import org.springframework.data.redis.core.RedisTemplate;
+import xyz.bsfeng.auth.config.AuthConfig;
 
 import java.util.concurrent.TimeUnit;
 

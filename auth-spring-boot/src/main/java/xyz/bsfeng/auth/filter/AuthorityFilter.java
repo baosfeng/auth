@@ -1,6 +1,5 @@
 package xyz.bsfeng.auth.filter;
 
-import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.anno.PreAuthorize;
 import xyz.bsfeng.auth.config.AuthConfig;
 import xyz.bsfeng.auth.constant.AuthConstant;
@@ -9,6 +8,7 @@ import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthCollectionUtils;
 import xyz.bsfeng.auth.utils.AuthStringUtils;
 import xyz.bsfeng.auth.utils.TokenUtils;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.IS_ADMIN;
 
 /**
  * @author Administrator
@@ -38,7 +36,7 @@ public class AuthorityFilter implements AuthFilter {
 		if (method == null) return;
 		PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
 		if (annotation == null) return;
-		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_ADMIN))) return;
+		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(AuthConstant.IS_ADMIN))) return;
 		String[] auths = annotation.hasAuth();
 		Set<String> authSet = Arrays.stream(auths).filter(AuthStringUtils::isNotEmpty).collect(Collectors.toSet());
 		if (AuthCollectionUtils.isNotEmpty(authSet)) {

@@ -1,5 +1,6 @@
 package xyz.bsfeng.auth.filter;
 
+import xyz.bsfeng.auth.exception.AuthException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
@@ -7,7 +8,6 @@ import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthUserBuilder;
 import xyz.bsfeng.auth.utils.AuthBooleanUtils;
 import xyz.bsfeng.auth.utils.AuthSpringUtils;

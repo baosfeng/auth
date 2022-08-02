@@ -1,14 +1,14 @@
 package xyz.bsfeng.auth.filter;
 
+import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.exception.AuthException;
+import xyz.bsfeng.auth.utils.AuthBooleanUtils;
+import xyz.bsfeng.auth.utils.AuthStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.constant.AuthConstant;
-import xyz.bsfeng.auth.exception.AuthException;
-import xyz.bsfeng.auth.utils.AuthBooleanUtils;
-import xyz.bsfeng.auth.utils.AuthStringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,8 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Enumeration;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
 /**
  * @author Administrator
@@ -36,7 +34,7 @@ public class TokenFilter implements AuthFilter {
 	                    @Nonnull HttpServletResponse response,
 	                    @Nonnull AuthConfig authConfig,
 	                    @Nullable Method method) {
-		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(IS_WHITE_URL))) return;
+		if (AuthBooleanUtils.isTrue((Boolean) request.getAttribute(AuthConstant.IS_WHITE_URL))) return;
 		String token = "";
 		String tokenFrom = "";
 		String currentTokenName = "";
@@ -69,9 +67,9 @@ public class TokenFilter implements AuthFilter {
 		}
 		if (authConfig.getLog()) log.debug("从{}中获取到{}:{}", tokenFrom, currentTokenName, token);
 		if (authConfig.getWhiteTokenList().contains(token)) {
-			request.setAttribute(IS_WHITE_TOKEN, true);
+			request.setAttribute(AuthConstant.IS_WHITE_TOKEN, true);
 		}
-		request.setAttribute(TOKEN_NAME, token);
+		request.setAttribute(AuthConstant.TOKEN_NAME, token);
 	}
 
 	private String doReadFromHeader(String userKey, HttpServletRequest servletRequest, String tokenName) {

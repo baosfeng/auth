@@ -1,19 +1,19 @@
 package xyz.bsfeng.auth.utils;
 
+import xyz.bsfeng.auth.constant.AuthConstant;
+import xyz.bsfeng.auth.event.UserLoginEvent;
+import xyz.bsfeng.auth.event.UserTokenKickOutEvent;
+import xyz.bsfeng.auth.exception.AuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.DigestUtils;
 import xyz.bsfeng.auth.TokenManager;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.constant.AuthConstant;
 import xyz.bsfeng.auth.dao.TempUser;
 import xyz.bsfeng.auth.dao.TokenDao;
 import xyz.bsfeng.auth.dao.UserInfo;
-import xyz.bsfeng.auth.event.UserLoginEvent;
 import xyz.bsfeng.auth.event.UserLogoutEvent;
-import xyz.bsfeng.auth.event.UserTokenKickOutEvent;
 import xyz.bsfeng.auth.event.UserTokenLockEvent;
-import xyz.bsfeng.auth.exception.AuthException;
 import xyz.bsfeng.auth.pojo.AuthUser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.*;
 
 public class TokenUtils {
 
@@ -84,10 +82,10 @@ public class TokenUtils {
 	public static String loginTemp(TempUser authUser, Long expireTime) {
 		if (AuthBooleanUtils.isFalse(enable)) throw new AuthException(414, "权限框架未启动!");
 		Long id = authUser.getId();
-		if (id == null) authUser.setId(TEMP_ID);
+		if (id == null) authUser.setId(AuthConstant.TEMP_ID);
 		String token = getTokenKey();
 		token = token.replace(tokenPrefix, "");
-		token = tokenPrefix + TEMP_PREFIX + token;
+		token = tokenPrefix + AuthConstant.TEMP_PREFIX + token;
 		tokenDao.setUserInfo(token, authUser, expireTime);
 		if (isLog) log.info("登录成功,当前登录用户为:{}", authUser);
 		AuthSpringUtils.publishEvent(new UserLoginEvent(authUser, token));
@@ -107,7 +105,7 @@ public class TokenUtils {
 			try {
 				boolean check = tempUser.check(authUser);
 				if (!check) {
-					throw new AuthException(TEMP_TOKEN_VALID_CODE, TEMP_TOKEN_VALID_MESSAGE);
+					throw new AuthException(AuthConstant.TEMP_TOKEN_VALID_CODE, AuthConstant.TEMP_TOKEN_VALID_MESSAGE);
 				}
 
 				// 一般来说,临时身份校验完毕,身份的权限可使用信息都会被消耗一部分,因此要及时更新
@@ -135,10 +133,10 @@ public class TokenUtils {
 	public static void kickOut(String token) {
 		if (AuthBooleanUtils.isFalse(enable)) return;
 		if (AuthStringUtils.isEmpty(token)) {
-			throw new AuthException(KICK_OUT_TOKEN_EMPTY_CODE, KICK_OUT_TOKEN_EMPTY_MESSAGE);
+			throw new AuthException(AuthConstant.KICK_OUT_TOKEN_EMPTY_CODE, AuthConstant.KICK_OUT_TOKEN_EMPTY_MESSAGE);
 		}
 		// 更新用户拥有的token集合
-		UserInfo user = (UserInfo) AuthSpringMVCUtil.getRequest().getAttribute(USER_INFO);
+		UserInfo user = (UserInfo) AuthSpringMVCUtil.getRequest().getAttribute(AuthConstant.USER_INFO);
 		tokenDao.deleteUserInfo(token);
 		if (isLog) log.debug("正在踢出{}的用户", token);
 		AuthSpringUtils.publishEvent(new UserTokenKickOutEvent(user, token));
@@ -153,7 +151,7 @@ public class TokenUtils {
 	public static void lock(String token, long lockTime) {
 		if (AuthBooleanUtils.isFalse(enable)) return;
 		if (lockTime < 0) {
-			throw new AuthException(LOCK_USER_TIME_VALID_CODE, LOCK_USER_TIME_VALID_MESSAGE);
+			throw new AuthException(AuthConstant.LOCK_USER_TIME_VALID_CODE, AuthConstant.LOCK_USER_TIME_VALID_MESSAGE);
 		}
 		UserInfo user = (UserInfo) tokenDao.getUserInfo(token);
 		if (user == null) {
@@ -169,7 +167,7 @@ public class TokenUtils {
 	public static Long getId() {
 		if (AuthBooleanUtils.isFalse(enable)) return -3L;
 		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
-		return (Long) request.getAttribute(USER_ID);
+		return (Long) request.getAttribute(AuthConstant.USER_ID);
 	}
 
 	public static UserInfo getUser() {
@@ -180,13 +178,13 @@ public class TokenUtils {
 	public static String getToken() {
 		if (AuthBooleanUtils.isFalse(enable)) return "";
 		HttpServletRequest servletRequest = AuthSpringMVCUtil.getRequest();
-		Object attribute = servletRequest.getAttribute(TOKEN_NAME);
+		Object attribute = servletRequest.getAttribute(AuthConstant.TOKEN_NAME);
 		return (String) attribute;
 	}
 
 	public static boolean isAdmin() {
 		if (AuthBooleanUtils.isFalse(enable)) return false;
-		return (boolean) AuthSpringMVCUtil.getRequest().getAttribute(IS_ADMIN);
+		return (boolean) AuthSpringMVCUtil.getRequest().getAttribute(AuthConstant.IS_ADMIN);
 	}
 
 	public static boolean hasRole(String roleName) {
@@ -246,7 +244,7 @@ public class TokenUtils {
 			return new AuthUser(-3L);
 		}
 		HttpServletRequest request = AuthSpringMVCUtil.getRequest();
-		return (UserInfo) request.getAttribute(USER_INFO);
+		return (UserInfo) request.getAttribute(AuthConstant.USER_INFO);
 	}
 
 }

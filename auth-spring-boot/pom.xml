@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>auth-spring-boot-starter</artifactId>
+	<version>2.0.5</version>
+	<name>auth</name>
+	<description>权限校验</description>
+	<parent>
+		<artifactId>auth-parent</artifactId>
+		<groupId>xyz.bsfeng</groupId>
+		<version>2.0.5</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- config -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>30.1.1-jre</version>
+		</dependency>
+	</dependencies>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+		</snapshotRepository>
+		<repository>
+			<id>nexus-releases</id>
+			<url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+		</repository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>nexus-snapshots</id>
+			<url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+		</repository>
+		<repository>
+			<id>nexus-releases</id>
+			<url>http://mevan.ezbim.cn:3037/nexus/content/repositories/thirdparty/</url>
+		</repository>
+	</repositories>
+</project>

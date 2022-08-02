@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-xyz.bsfeng.auth.TokenConfiguration
+auth.TokenConfiguration
 org.springframework.boot.diagnostics.FailureAnalyzer=\
-xyz.bsfeng.auth.running.AuthFailureAnalyzers
+auth.running.AuthFailureAnalyzers

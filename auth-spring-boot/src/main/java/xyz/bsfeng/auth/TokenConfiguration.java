@@ -1,5 +1,12 @@
 package xyz.bsfeng.auth;
 
+import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
+import xyz.bsfeng.auth.dao.TokenDao;
+import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
+import xyz.bsfeng.auth.filter.MyFilter;
+import xyz.bsfeng.auth.listener.AuthBeanPostProcessor;
+import xyz.bsfeng.auth.running.AuthEnvironmentAware;
+import xyz.bsfeng.auth.utils.AuthSpringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,13 +19,6 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.bsfeng.auth.config.AuthConfig;
-import xyz.bsfeng.auth.dao.RedisTokenDaoImpl;
-import xyz.bsfeng.auth.dao.TokenDao;
-import xyz.bsfeng.auth.dao.TokenDaoDefaultImpl;
-import xyz.bsfeng.auth.filter.MyFilter;
-import xyz.bsfeng.auth.listener.AuthBeanPostProcessor;
-import xyz.bsfeng.auth.running.AuthEnvironmentAware;
-import xyz.bsfeng.auth.utils.AuthSpringUtils;
 
 /**
  * @author bsfeng
@@ -53,7 +53,7 @@ public class TokenConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	@ConfigurationProperties("auth")
+	@ConfigurationProperties("xyz/bsfeng/auth")
 	public AuthConfig authConfig() {
 		return new AuthConfig();
 	}

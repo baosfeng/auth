@@ -1,10 +1,11 @@
 package xyz.bsfeng.auth.filter;
 
+import xyz.bsfeng.auth.anno.IgnoreLogin;
+import xyz.bsfeng.auth.anno.MustLogin;
+import xyz.bsfeng.auth.constant.AuthConstant;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.AntPathMatcher;
-import xyz.bsfeng.auth.anno.IgnoreLogin;
-import xyz.bsfeng.auth.anno.MustLogin;
 import xyz.bsfeng.auth.config.AuthConfig;
 
 import javax.annotation.Nonnull;
@@ -12,8 +13,6 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-
-import static xyz.bsfeng.auth.constant.AuthConstant.IS_WHITE_URL;
 
 /**
  * @author Administrator
@@ -32,11 +31,11 @@ public class WhiteUrlFilter implements AuthFilter {
 	                    @Nullable Method method) {
 		if (method != null) {
 			if (method.isAnnotationPresent(MustLogin.class)) {
-				request.setAttribute(IS_WHITE_URL, false);
+				request.setAttribute(AuthConstant.IS_WHITE_URL, false);
 				return;
 			}
 			if (method.isAnnotationPresent(IgnoreLogin.class)) {
-				request.setAttribute(IS_WHITE_URL, true);
+				request.setAttribute(AuthConstant.IS_WHITE_URL, true);
 				return;
 			}
 		}
@@ -46,17 +45,17 @@ public class WhiteUrlFilter implements AuthFilter {
 		for (String url : blackUrlList) {
 			boolean match = MATCHER.match(url, uri);
 			if (match) {
-				request.setAttribute(IS_WHITE_URL, false);
+				request.setAttribute(AuthConstant.IS_WHITE_URL, false);
 				return;
 			}
 		}
 		for (String white : whiteUrlList) {
 			boolean match = MATCHER.match(white, uri);
 			if (match) {
-				request.setAttribute(IS_WHITE_URL, true);
+				request.setAttribute(AuthConstant.IS_WHITE_URL, true);
 				return;
 			}
 		}
-		request.setAttribute(IS_WHITE_URL, false);
+		request.setAttribute(AuthConstant.IS_WHITE_URL, false);
 	}
 }
